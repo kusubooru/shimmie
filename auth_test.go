@@ -1,4 +1,4 @@
-package auth_test
+package shimmie_test
 
 import (
 	"testing"
