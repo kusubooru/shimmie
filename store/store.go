@@ -1,67 +1,52 @@
 package store
 
 import (
-	"errors"
+	"database/sql"
+	"log"
+	"time"
 
+	// mysql driver
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/kusubooru/shimmie"
-
-	"golang.org/x/net/context"
 )
 
-const key = "shimmiestore"
-
-// NewContext returns a new Context carrying store.
-func NewContext(ctx context.Context, store Store) context.Context {
-	return context.WithValue(ctx, key, store)
+type datastore struct {
+	*sql.DB
 }
 
-// FromContext extracts the store from ctx, if present.
-func FromContext(ctx context.Context) (Store, bool) {
-	// ctx.Value returns nil if ctx has no value for the key;
-	// the Store type assertion returns ok=false for nil.
-	s, ok := ctx.Value(key).(Store)
-	return s, ok
+// Open creates a database connection for the given driver and configuration.
+func Open(driver, config string) shimmie.Store {
+	db := openDB(driver, config)
+	return &datastore{db}
 }
 
-// Store describes all the operations that need to access database storage.
-type Store interface {
-	// GetUser gets a user by unique username.
-	GetUser(username string) (*shimmie.User, error)
-
-	// GetConfig gets shimmie config values.
-	GetConfig(keys ...string) (map[string]string, error)
-	// GetCommonConf gets configuration values needed by the program.
-	GetCommonConf() (*shimmie.Common, error)
-
-	// GetSafeBustedImages returns all the images that have been rated as safe
-	// ignoring the ones from username.
-	GetSafeBustedImages(username string) ([]shimmie.Image, error)
-}
-
-// GetSafeBustedImages returns all the images that have been rated as safe
-// ignoring the ones from username.
-func GetSafeBustedImages(ctx context.Context, username string) ([]shimmie.Image, error) {
-	s, ok := FromContext(ctx)
-	if !ok {
-		return nil, errors.New("no store in context")
+// openDB opens a new database connection with the specified driver and
+// connection string.
+func openDB(driver, config string) *sql.DB {
+	db, err := sql.Open(driver, config)
+	if err != nil {
+		log.Fatalln("database connection failed:", err)
 	}
-	return s.GetSafeBustedImages(username)
+	if driver == "mysql" {
+		// per issue https://github.com/go-sql-driver/mysql/issues/257
+		db.SetMaxIdleConns(0)
+	}
+	if err := pingDatabase(db); err != nil {
+		log.Fatalln("database ping attempts failed:", err)
+	}
+	return db
 }
 
-// GetConfig gets shimmie config values.
-func GetConfig(ctx context.Context, keys ...string) (map[string]string, error) {
-	s, ok := FromContext(ctx)
-	if !ok {
-		return nil, errors.New("no store in context")
+// helper function to ping the database with backoff to ensure a connection can
+// be established before we proceed.
+func pingDatabase(db *sql.DB) (err error) {
+	for i := 0; i < 10; i++ {
+		err = db.Ping()
+		if err == nil {
+			return
+		}
+		log.Print("database ping failed. retry in 1s")
+		time.Sleep(time.Second)
 	}
-	return s.GetConfig(keys...)
-}
-
-// GetUser gets a user by unique username.
-func GetUser(ctx context.Context, username string) (*shimmie.User, error) {
-	s, ok := FromContext(ctx)
-	if !ok {
-		return nil, errors.New("no store in context")
-	}
-	return s.GetUser(username)
+	return
 }
