@@ -1,6 +1,33 @@
 package shimmie
 
-import "time"
+import (
+	"strings"
+	"time"
+)
+
+type Shimmie struct {
+	Store Store
+}
+
+func New(s Store) *Shimmie {
+	return &Shimmie{Store: s}
+}
+
+// Store describes all the operations that need to access database storage.
+type Store interface {
+	// GetUser gets a user by unique username.
+	GetUser(username string) (*User, error)
+
+	// GetConfig gets shimmie config values.
+	GetConfig(keys ...string) (map[string]string, error)
+
+	// GetCommon gets common configuration values.
+	GetCommon() (*Common, error)
+
+	// GetSafeBustedImages returns all the images that have been rated as safe
+	// ignoring the ones from username.
+	GetSafeBustedImages(username string) ([]Image, error)
+}
 
 // User represents a shimmie image.
 type Image struct {
@@ -30,4 +57,17 @@ type User struct {
 	Admin    string
 	Email    string
 	Class    string
+}
+
+// CommonConf holds common configuration values.
+type Common struct {
+	Title       string
+	AnalyticsID string
+	Description string
+	Keywords    string
+}
+
+// SiteTitle returns the Title capitalized.
+func (c Common) SiteTitle() string {
+	return strings.Title(c.Title)
 }

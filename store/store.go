@@ -30,6 +30,8 @@ type Store interface {
 
 	// GetConfig gets shimmie config values.
 	GetConfig(keys ...string) (map[string]string, error)
+	// GetCommonConf gets configuration values needed by the program.
+	GetCommonConf() (*shimmie.Common, error)
 
 	// GetSafeBustedImages returns all the images that have been rated as safe
 	// ignoring the ones from username.
