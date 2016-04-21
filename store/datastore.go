@@ -1,4 +1,4 @@
-package datastore
+package store
 
 import (
 	"database/sql"
@@ -7,7 +7,7 @@ import (
 
 	// mysql driver
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/kusubooru/shimmie/store"
+	"github.com/kusubooru/shimmie"
 )
 
 type datastore struct {
@@ -15,7 +15,7 @@ type datastore struct {
 }
 
 // Open creates a database connection for the given driver and configuration.
-func Open(driver, config string) store.Store {
+func Open(driver, config string) shimmie.Store {
 	db := openDB(driver, config)
 	return &datastore{db}
 }
