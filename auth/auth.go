@@ -1,4 +1,4 @@
-package shimmie
+package auth
 
 import (
 	"crypto/md5"
@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kusubooru/teian/store"
+	"github.com/kusubooru/shimmie/store"
 
 	"golang.org/x/net/context"
 )
@@ -20,7 +20,7 @@ func Hash(s string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
 }
 
-// Auth is a handler wrapper that checks if a user is authenticated to Shimmie.
+// Handler is a handler wrapper that checks if a user is authenticated to Shimmie.
 // It checks for two cookies "shm_user" and "shm_session". The first
 // contains the username which is used to query the database and the get user's
 // password hash. Then it attempts to recreate the "shm_session" cookie value
@@ -28,7 +28,7 @@ func Hash(s string) string {
 // does not match the "shm_session" cookie value then it redirects to
 // redirectPath. If redirectURL is empty then "/user_admin/login" is used
 // instead which is the default login URL for Shimmie.
-func Auth(ctx context.Context, fn func(context.Context, http.ResponseWriter, *http.Request), redirectURL string) http.HandlerFunc {
+func Handler(ctx context.Context, fn func(context.Context, http.ResponseWriter, *http.Request), redirectURL string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const defaultLoginURL = "/user_admin/login"
 		if redirectURL == "" {
