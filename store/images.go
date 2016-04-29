@@ -62,17 +62,17 @@ func (db *datastore) WriteImageFile(w io.Writer, path, hash string) error {
 	buf := make([]byte, 1024)
 	for {
 		// read a chunk
-		n, err := r.Read(buf)
-		if err != nil && err != io.EOF {
-			return err
+		n, rerr := r.Read(buf)
+		if rerr != nil && rerr != io.EOF {
+			return rerr
 		}
 		if n == 0 {
 			break
 		}
 
 		// write a chunk
-		if _, err := w.Write(buf[:n]); err != nil {
-			return err
+		if _, werr := w.Write(buf[:n]); werr != nil {
+			return werr
 		}
 	}
 	return err
@@ -83,7 +83,12 @@ func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, erro
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if cerr := rows.Close(); err == nil {
+			err = cerr
+			return
+		}
+	}()
 
 	var (
 		img    shimmie.RatedImage
@@ -91,7 +96,7 @@ func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, erro
 	)
 	for rows.Next() {
 		var source sql.NullString
-		err := rows.Scan(
+		err = rows.Scan(
 			&img.ID,
 			&img.OwnerID,
 			&img.OwnerIP,
@@ -119,7 +124,7 @@ func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, erro
 		}
 		images = append(images, img)
 	}
-	return images, nil
+	return images, err
 }
 
 const (
