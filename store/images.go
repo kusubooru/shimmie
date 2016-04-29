@@ -99,7 +99,7 @@ func (db *datastore) WriteImageFile(w io.Writer, path, hash string) error {
 }
 
 func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, error) {
-	rows, err := db.Query(imageGetSafeBustedQuery, username)
+	rows, err := db.Query(imageGetRatedQuery, username)
 	if err != nil {
 		return nil, err
 	}
@@ -149,27 +149,43 @@ func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, erro
 
 const (
 
-	// imageGetSafeBustedQuery searches score_log for images set as "Safe" ignoring
-	// ones from a specific username, extracts the ID of the images and returns
-	// them.
+	// imageGetRatedQuery searches score_log in section "rating" for messages
+	// containing "set to: Safe" and extracts the IDs of those images from the
+	// log message. It only keeps the latest log ID rows for each extracted
+	// image ID. Then it connects the extracted image IDs with images with
+	// rating="s" from the "images" table ignoring ones from a specific
+	// username (rater) and finally returns those images including the username
+	// (rater), the user IP and the date of the original log message.
+	//
+	// Basically this query allows to find all the images rated as Safe from
+	// all users except a specific one while if that specific user rates an
+	// image as Safe again (approval), that image won't appear in the results.
+	// Since shimmie does not keep a rating history we have to do ugly work
+	// using the shimmie log.
 	//
 	// Warning: MySQL specific query.
-	imageGetSafeBustedQuery = `
+	imageGetRatedQuery = `
 SELECT
   img.*, rater, rater_ip, rate_date
 FROM images as img, (
   SELECT 
-    SUBSTRING_INDEX(SUBSTRING_INDEX(message, '#', -1), ' ', 1) AS id,
-	score_log.address as rater_ip,
-	score_log.username as rater,
-	score_log.date_sent as rate_date
-  FROM score_log
-  WHERE message
-  LIKE "%set to: Safe"
-  AND username != ?
-  ORDER BY date_sent DESC) as safe
-WHERE img.id = safe.id
+    max(log_id) as max_log_id, rated_id, rater_ip, rater, rate_date
+  FROM (
+    SELECT
+	  score_log.id as log_id,
+      SUBSTRING_INDEX(SUBSTRING_INDEX(message, '#', -1), ' ', 1) AS rated_id,
+      score_log.address as rater_ip,
+      score_log.username as rater,
+      score_log.date_sent as rate_date
+    FROM score_log
+    WHERE message LIKE "%set to: Safe"
+    AND section = "rating"
+    ORDER BY log_id DESC) as safe
+  GROUP BY rated_id
+  ORDER by max_log_id desc) as latest_safe
+WHERE img.id = latest_safe.rated_id
 AND rating = 's'
+AND rater != ?
 `
 
 	imageGetQuery = `
