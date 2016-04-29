@@ -12,6 +12,14 @@ const (
 	imageRatingExplicit     = "Explicit"
 )
 
+// ImageRating converts rating letters to full words.
+//
+//		s -> Safe
+//		q -> Questionable
+//		e -> Explicit
+//
+// If another value except (s, q, e) is given, then it returns that value as it
+// is.
 func ImageRating(rating string) string {
 	switch rating {
 	case "s":
