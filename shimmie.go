@@ -6,12 +6,15 @@ import (
 	"time"
 )
 
+// Shimmie represents an installed shimmie2 project.
 type Shimmie struct {
 	ImagePath string
 	ThumbPath string
 	Store
 }
 
+// New creates a new Shimmie by providing a store with the database
+// configuration and the paths of the images and thumbs.
 func New(imgPath, thumbPath string, s Store) *Shimmie {
 	return &Shimmie{ImagePath: imgPath, ThumbPath: thumbPath, Store: s}
 }
