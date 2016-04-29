@@ -6,6 +6,24 @@ import (
 	"time"
 )
 
+const (
+	ImageRatingSafe         = "Safe"
+	ImageRatingQuestionable = "Questionable"
+	ImageRatingExplicit     = "Explicit"
+)
+
+func ImageRating(rating string) string {
+	switch rating {
+	case "s":
+		return ImageRatingSafe
+	case "q":
+		return ImageRatingQuestionable
+	case "e":
+		return ImageRatingExplicit
+	}
+	return rating
+}
+
 // Shimmie represents an installed shimmie2 project.
 type Shimmie struct {
 	ImagePath string
