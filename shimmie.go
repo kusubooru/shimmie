@@ -7,19 +7,19 @@ import (
 )
 
 const (
-	ImageRatingSafe         = "Safe"
-	ImageRatingQuestionable = "Questionable"
-	ImageRatingExplicit     = "Explicit"
+	imageRatingSafe         = "Safe"
+	imageRatingQuestionable = "Questionable"
+	imageRatingExplicit     = "Explicit"
 )
 
 func ImageRating(rating string) string {
 	switch rating {
 	case "s":
-		return ImageRatingSafe
+		return imageRatingSafe
 	case "q":
-		return ImageRatingQuestionable
+		return imageRatingQuestionable
 	case "e":
-		return ImageRatingExplicit
+		return imageRatingExplicit
 	}
 	return rating
 }
