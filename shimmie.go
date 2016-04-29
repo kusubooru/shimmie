@@ -58,6 +58,21 @@ type Store interface {
 	// WriteImageFile reads a shimmie image file (image or thumb) which exists
 	// under a path and has a hash and then writes to w.
 	WriteImageFile(w io.Writer, path, hash string) error
+
+	// Log stores a message on score_log table.
+	Log(section, username, address string, priority int, message string) (*SCoreLog, error)
+	// LogRating logs when an image rating is set.
+	LogRating(imgID int, rating, username, userIP string) error
+}
+
+type SCoreLog struct {
+	ID       int64
+	DateSent *time.Time
+	Section  string
+	Username string
+	Address  string
+	Priority int
+	Message  string
 }
 
 // RatedImage represents a shimmie image that also carries information about
