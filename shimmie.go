@@ -29,7 +29,7 @@ type Store interface {
 
 	// GetSafeBustedImages returns all the images that have been rated as safe
 	// ignoring the ones from username.
-	GetSafeBustedImages(username string) ([]RatedImage, error)
+	GetRatedImages(username string) ([]RatedImage, error)
 	// GetImage gets a shimmie Image metadata (not it's bytes).
 	GetImage(id int) (*Image, error)
 	// WriteImageFile reads a shimmie image file (image or thumb) which exists

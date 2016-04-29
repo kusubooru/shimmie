@@ -78,7 +78,7 @@ func (db *datastore) WriteImageFile(w io.Writer, path, hash string) error {
 	return err
 }
 
-func (db *datastore) GetSafeBustedImages(username string) ([]shimmie.RatedImage, error) {
+func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, error) {
 	rows, err := db.Query(imageGetSafeBustedQuery, username)
 	if err != nil {
 		return nil, err
