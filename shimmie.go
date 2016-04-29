@@ -73,6 +73,8 @@ type Store interface {
 	LogRating(imgID int, rating, username, userIP string) error
 }
 
+// SCoreLog represents a log message in the shimmie log that is stored in the
+// table "score_log".
 type SCoreLog struct {
 	ID       int64
 	DateSent *time.Time
