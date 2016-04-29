@@ -6,11 +6,13 @@ import (
 )
 
 type Shimmie struct {
-	Store Store
+	ImagePath string
+	ThumbPath string
+	Store
 }
 
-func New(s Store) *Shimmie {
-	return &Shimmie{Store: s}
+func New(imgPath, thumbPath string, s Store) *Shimmie {
+	return &Shimmie{ImagePath: imgPath, ThumbPath: thumbPath, Store: s}
 }
 
 // Store describes all the operations that need to access database storage.
