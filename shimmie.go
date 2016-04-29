@@ -1,6 +1,7 @@
 package shimmie
 
 import (
+	"io"
 	"strings"
 	"time"
 )
@@ -28,7 +29,21 @@ type Store interface {
 
 	// GetSafeBustedImages returns all the images that have been rated as safe
 	// ignoring the ones from username.
-	GetSafeBustedImages(username string) ([]Image, error)
+	GetSafeBustedImages(username string) ([]RatedImage, error)
+	// GetImage gets a shimmie Image metadata (not it's bytes).
+	GetImage(id int) (*Image, error)
+	// WriteImageFile reads a shimmie image file (image or thumb) which exists
+	// under a path and has a hash and then writes to w.
+	WriteImageFile(w io.Writer, path, hash string) error
+}
+
+// RatedImage represents a shimmie image that also carries information about
+// who rated it and when.
+type RatedImage struct {
+	Image
+	Rater    string
+	RaterIP  string
+	RateDate *time.Time
 }
 
 // User represents a shimmie image.
