@@ -30,7 +30,7 @@ type Store interface {
 	// GetCommon gets common configuration values.
 	GetCommon() (*Common, error)
 
-	// GetSafeBustedImages returns all the images that have been rated as safe
+	// GetRatedImages returns all the images that have been rated as safe
 	// ignoring the ones from username.
 	GetRatedImages(username string) ([]RatedImage, error)
 	// GetImage gets a shimmie Image metadata (not it's bytes).
@@ -49,7 +49,7 @@ type RatedImage struct {
 	RateDate *time.Time
 }
 
-// User represents a shimmie image.
+// Image represents a shimmie image.
 type Image struct {
 	ID           int
 	OwnerID      int
@@ -79,7 +79,7 @@ type User struct {
 	Class    string
 }
 
-// CommonConf holds common configuration values.
+// Common holds common configuration values.
 type Common struct {
 	Title       string
 	AnalyticsID string
