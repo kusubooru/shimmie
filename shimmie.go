@@ -35,6 +35,8 @@ type Store interface {
 	GetRatedImages(username string) ([]RatedImage, error)
 	// GetImage gets a shimmie Image metadata (not it's bytes).
 	GetImage(id int) (*Image, error)
+	// RateImage sets the rating for an image.
+	RateImage(id int, rating string) error
 	// WriteImageFile reads a shimmie image file (image or thumb) which exists
 	// under a path and has a hash and then writes to w.
 	WriteImageFile(w io.Writer, path, hash string) error

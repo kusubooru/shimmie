@@ -11,7 +11,27 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
+func (db *datastore) RateImage(id int, rating string) error {
+	stmt, err := db.Prepare(imageUpdateRatingStmt)
+	if err != nil {
+		return err
+	}
+
+	res, err := stmt.Exec(rating, id)
+	if err != nil {
+		return err
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (db *datastore) GetImage(id int) (*shimmie.Image, error) {
+
 	var (
 		img    shimmie.Image
 		source sql.NullString
@@ -155,6 +175,12 @@ AND rating = 's'
 	imageGetQuery = `
 SELECT * 
 FROM images 
+WHERE id=?
+`
+
+	imageUpdateRatingStmt = `
+UPDATE images 
+SET rating=? 
 WHERE id=?
 `
 )
