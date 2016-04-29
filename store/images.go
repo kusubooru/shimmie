@@ -23,11 +23,8 @@ func (db *datastore) RateImage(id int, rating string) error {
 	}
 
 	_, err = res.RowsAffected()
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (db *datastore) GetImage(id int) (*shimmie.Image, error) {

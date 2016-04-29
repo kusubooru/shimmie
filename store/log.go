@@ -10,11 +10,10 @@ import (
 func (db *datastore) LogRating(imgID int, imgRating, username, userIP string) error {
 	rating := shimmie.ImageRating(imgRating)
 	msg := fmt.Sprintf("Rating for Image #%d set to: %v", imgID, rating)
+
 	_, err := db.Log("rating", username, userIP, 20, msg)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
 
 func (db *datastore) Log(section, username, address string, priority int, message string) (*shimmie.SCoreLog, error) {
