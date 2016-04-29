@@ -57,7 +57,7 @@ func (shim *Shimmie) Auth(ctx context.Context, fn func(context.Context, http.Res
 			return
 		}
 		passwordHash := user.Pass
-		userIP := getOriginalIP(r)
+		userIP := GetOriginalIP(r)
 		sessionCookieValue := CookieValue(passwordHash, userIP)
 		if sessionCookieValue != sessionCookie.Value {
 			http.Redirect(w, r, redirectURL, http.StatusFound)
@@ -68,7 +68,9 @@ func (shim *Shimmie) Auth(ctx context.Context, fn func(context.Context, http.Res
 	}
 }
 
-func getOriginalIP(r *http.Request) string {
+// GetOriginalIP gets the original IP of the HTTP for the case of being behind
+// a proxy. It searches for the X-Forwarded-For header.
+func GetOriginalIP(r *http.Request) string {
 	x := r.Header.Get("X-Forwarded-For")
 	if x != "" && strings.Contains(r.RemoteAddr, "127.0.0.1") {
 		// format is comma separated
