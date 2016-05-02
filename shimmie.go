@@ -94,6 +94,10 @@ type RatedImage struct {
 	RateDate *time.Time
 }
 
+func (ri RatedImage) RateDateFormat() string {
+	return ri.RateDate.UTC().Format("Mon 02 Jan 2006 15:04:05 MST")
+}
+
 // Image represents a shimmie image.
 type Image struct {
 	ID           int
