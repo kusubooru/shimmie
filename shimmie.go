@@ -111,6 +111,10 @@ type Image struct {
 	NumericScore int
 	Rating       string
 	Favorites    int
+	ParentID     int64
+	HasChildren  bool
+	Author       string
+	Notes        int
 }
 
 // User represents a shimmie user.

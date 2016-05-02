@@ -30,8 +30,10 @@ func (db *datastore) RateImage(id int, rating string) error {
 func (db *datastore) GetImage(id int) (*shimmie.Image, error) {
 
 	var (
-		img    shimmie.Image
-		source sql.NullString
+		img      shimmie.Image
+		source   sql.NullString
+		parentID sql.NullInt64
+		author   sql.NullString
 	)
 	err := db.QueryRow(imageGetQuery, id).Scan(
 		&img.ID,
@@ -49,12 +51,22 @@ func (db *datastore) GetImage(id int) (*shimmie.Image, error) {
 		&img.NumericScore,
 		&img.Rating,
 		&img.Favorites,
+		&parentID,
+		&img.HasChildren,
+		&author,
+		&img.Notes,
 	)
 	if err != nil {
 		return nil, err
 	}
 	if source.Valid {
 		img.Source = source.String
+	}
+	if parentID.Valid {
+		img.ParentID = parentID.Int64
+	}
+	if author.Valid {
+		img.Author = author.String
 	}
 
 	return &img, nil
@@ -112,7 +124,11 @@ func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, erro
 		images []shimmie.RatedImage
 	)
 	for rows.Next() {
-		var source sql.NullString
+		var (
+			source   sql.NullString
+			parentID sql.NullInt64
+			author   sql.NullString
+		)
 		err = rows.Scan(
 			&img.ID,
 			&img.OwnerID,
@@ -129,6 +145,10 @@ func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, erro
 			&img.NumericScore,
 			&img.Rating,
 			&img.Favorites,
+			&parentID,
+			&img.HasChildren,
+			&author,
+			&img.Notes,
 			&img.Rater,
 			&img.RaterIP,
 			&img.RateDate,
@@ -138,6 +158,12 @@ func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, erro
 		}
 		if source.Valid {
 			img.Source = source.String
+		}
+		if parentID.Valid {
+			img.ParentID = parentID.Int64
+		}
+		if author.Valid {
+			img.Author = author.String
 		}
 		images = append(images, img)
 	}
