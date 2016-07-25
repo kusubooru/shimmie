@@ -45,7 +45,6 @@ func (db *datastore) GetTagHistory(id int) (*shimmie.TagHistory, error) {
 		&th.UserIP,
 		&th.Tags,
 		&th.DateSet,
-		&th.Name,
 	)
 	if err != nil {
 		return nil, err
