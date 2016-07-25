@@ -72,8 +72,10 @@ type Store interface {
 	// LogRating logs when an image rating is set.
 	LogRating(imgID int, rating, username, userIP string) error
 
-	// GetTagHistory returns the previous tags of an image.
-	GetTagHistory(imageID int) ([]TagHistory, error)
+	// GetImageTagHistory returns the previous tags of an image.
+	GetImageTagHistory(imageID int) ([]TagHistory, error)
+	// GetTagHistory returns a tag_history row.
+	GetTagHistory(imageID int) (*TagHistory, error)
 }
 
 // SCoreLog represents a log message in the shimmie log that is stored in the
