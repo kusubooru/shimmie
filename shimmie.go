@@ -76,6 +76,10 @@ type Store interface {
 	GetImageTagHistory(imageID int) ([]TagHistory, error)
 	// GetTagHistory returns a tag_history row.
 	GetTagHistory(imageID int) (*TagHistory, error)
+	// GetContributedTagHistory returns the latest tag history i.e. tag changes
+	// that were done by a contributor on an owner's image, per image. It is
+	// used to fetch data for the "Tag Approval" page.
+	GetContributedTagHistory(imageOwnerUsername string) ([]ContributedTagHistory, error)
 }
 
 // SCoreLog represents a log message in the shimmie log that is stored in the
@@ -159,4 +163,18 @@ type TagHistory struct {
 	Tags    string
 	DateSet *time.Time
 	Name    string
+}
+
+// ContributedTagHistory holds previous tags for an image that were set by
+// contributors.
+type ContributedTagHistory struct {
+	ID         int
+	ImageID    int
+	OwnerID    int
+	OwnerName  string
+	TaggerID   int
+	TaggerName string
+	TaggerIP   string
+	Tags       string
+	DateSet    *time.Time
 }
