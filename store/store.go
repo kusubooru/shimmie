@@ -14,6 +14,10 @@ type datastore struct {
 	*sql.DB
 }
 
+func (db datastore) SQLDB() *sql.DB {
+	return db.DB
+}
+
 // Open creates a database connection for the given driver and configuration.
 func Open(driver, config string) shimmie.Store {
 	db := openDB(driver, config)
