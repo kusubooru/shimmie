@@ -3,7 +3,7 @@ package shimmie_test
 import (
 	"testing"
 
-	. "github.com/kusubooru/teian/shimmie"
+	. "github.com/kusubooru/shimmie"
 )
 
 var CookieValueTests = []struct {
@@ -12,8 +12,8 @@ var CookieValueTests = []struct {
 	ip       string
 	out      string
 }{
-	{"user1", "pass1", "11.11.11.11", Hash(Hash("user1pass1") + "11.11.0.0")},
-	{"user2", "pass2", "22.22.22.22", Hash(Hash("user2pass2") + "22.22.0.0")},
+	{"user1", "pass1", "11.11.11.11", Hash(PasswordHash("user1", "pass1") + "11.11.0.0")},
+	{"user2", "pass2", "22.22.22.22", Hash(PasswordHash("user2", "pass2") + "22.22.0.0")},
 }
 
 func TestCookieValue(t *testing.T) {

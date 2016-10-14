@@ -17,6 +17,13 @@ func Hash(s string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
 }
 
+// PasswordHash returns the password hash of a username and password the same
+// way that shimmie2 does it.
+func PasswordHash(username, password string) string {
+	hash := md5.Sum([]byte(strings.ToLower(username) + password))
+	return fmt.Sprintf("%x", hash)
+}
+
 // Auth is a handler wrapper that checks if a user is authenticated to Shimmie.
 // It checks for two cookies "shm_user" and "shm_session". The first
 // contains the username which is used to query the database and the get user's

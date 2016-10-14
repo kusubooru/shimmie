@@ -103,6 +103,8 @@ type RatedImage struct {
 	RateDate *time.Time
 }
 
+// RateDateFormat returns the RateDate as UTC with Mon 02 Jan 2006 15:04:05 MST
+// format.
 func (ri RatedImage) RateDateFormat() string {
 	return ri.RateDate.UTC().Format("Mon 02 Jan 2006 15:04:05 MST")
 }
