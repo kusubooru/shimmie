@@ -1,3 +1,5 @@
+// +build integration
+
 package store_test
 
 import (
@@ -14,7 +16,7 @@ var (
 	dbDriver     = flag.String("dbdriver", "mysql", "database driver")
 	dbInitConfig = flag.String("dbinitconfig", "", "username:password@(host:port)/database?parseTime=true")
 	dbConfig     = flag.String("dbconfig", "", "username:password@(host:port)/database?parseTime=true")
-	dbName       = flag.String("dbname", "kusubooru_test_db", "database name to run tests on")
+	dbName       = flag.String("dbname", "kusubooru_test", "database name to run tests on")
 )
 
 func init() {
