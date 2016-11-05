@@ -54,3 +54,7 @@ func pingDatabase(db *sql.DB) (err error) {
 	}
 	return
 }
+
+func (db datastore) Close() error {
+	return db.DB.Close()
+}

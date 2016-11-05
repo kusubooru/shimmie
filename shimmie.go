@@ -84,6 +84,9 @@ type Store interface {
 	// that were done by a contributor on an owner's image, per image. It is
 	// used to fetch data for the "Tag Approval" page.
 	GetContributedTagHistory(imageOwnerUsername string) ([]ContributedTagHistory, error)
+
+	// Close closes the connection with the database.
+	Close() error
 }
 
 // SCoreLog represents a log message in the shimmie log that is stored in the
