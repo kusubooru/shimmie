@@ -39,7 +39,7 @@ func (db *datastore) GetCommon() (*shimmie.Common, error) {
 }
 
 func (db *datastore) GetConfig(keys ...string) (map[string]string, error) {
-	query := fmt.Sprintf(configGetQuery)
+	query := fmt.Sprint(configGetQuery)
 	if len(keys) != 0 {
 		query = fmt.Sprintf("%vWHERE\n", query)
 		for _, k := range keys {
