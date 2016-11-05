@@ -138,7 +138,7 @@ type Image struct {
 
 // User represents a shimmie user.
 type User struct {
-	ID       int
+	ID       int64
 	Name     string
 	Pass     string
 	JoinDate *time.Time
