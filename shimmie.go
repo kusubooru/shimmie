@@ -53,6 +53,10 @@ type Store interface {
 
 	// GetUser gets a user by unique username.
 	GetUser(username string) (*User, error)
+	// CreateUser creates a new user and returns their ID.
+	CreateUser(*User) error
+	// DeleteUser deletes a user based on their ID.
+	DeleteUser(int64) error
 
 	// GetConfig gets shimmie config values.
 	GetConfig(keys ...string) (map[string]string, error)
