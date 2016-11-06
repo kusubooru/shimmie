@@ -61,13 +61,13 @@ func (db schema) Close() error {
 const duplicateColumnName = 1060
 
 func createSchema(tx *sql.Tx) (string, error) {
-	for _, query := range createQueries {
+	for _, query := range createStatements {
 		if _, err := tx.Exec(query); err != nil {
 			return query, err
 		}
 	}
 
-	for _, query := range alterQueries {
+	for _, query := range alterStatements {
 		if _, err := tx.Exec(query); err != nil {
 			if driverErr, ok := err.(*mysql.MySQLError); ok {
 				if driverErr.Number != duplicateColumnName {
@@ -79,19 +79,19 @@ func createSchema(tx *sql.Tx) (string, error) {
 	return "", nil
 }
 
-var createQueries = []string{
-	usersCreateQuery,
-	imagesCreateQuery,
-	tagsCreateQuery,
-	tagHistoriesCreateQuery,
-	imageTagsCreateQuery,
-	aliasesCreateQuery,
+var createStatements = []string{
+	usersCreateTableStmt,
+	imagesCreateTableStmt,
+	tagsCreateTableStmt,
+	tagHistoriesCreateTableStmt,
+	imageTagsCreateTableStmt,
+	aliasesCreateTableStmt,
 }
 
-var alterQueries = []string{}
+var alterStatements = []string{}
 
 const (
-	usersCreateQuery = `
+	usersCreateTableStmt = `
 CREATE TABLE IF NOT EXISTS users (
 	id INTEGER NOT NULL AUTO_INCREMENT,
 	name VARCHAR(32) NOT NULL,
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS users (
 	UNIQUE KEY (name)
 );
 `
-	imagesCreateQuery = `
+	imagesCreateTableStmt = `
 CREATE TABLE IF NOT EXISTS images (
 	id INTEGER NOT NULL AUTO_INCREMENT,
 	owner_id INTEGER NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS images (
 	FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE RESTRICT
 );
 `
-	tagsCreateQuery = `
+	tagsCreateTableStmt = `
 CREATE TABLE IF NOT EXISTS tags (
   id int(11) NOT NULL AUTO_INCREMENT,
   tag varchar(64) NOT NULL,
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS tags (
   UNIQUE KEY tag (tag)
 );
 `
-	tagHistoriesCreateQuery = `
+	tagHistoriesCreateTableStmt = `
 CREATE TABLE IF NOT EXISTS tag_histories (
 	id INTEGER NOT NULL AUTO_INCREMENT,
 	image_id INTEGER NOT NULL,
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS tag_histories (
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 `
-	imageTagsCreateQuery = `
+	imageTagsCreateTableStmt = `
 CREATE TABLE IF NOT EXISTS image_tags (
   image_id int(11) NOT NULL,
   tag_id int(11) NOT NULL,
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS image_tags (
   CONSTRAINT image_tags_ibfk_2 FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
 );
 `
-	aliasesCreateQuery = `
+	aliasesCreateTableStmt = `
 CREATE TABLE IF NOT EXISTS aliases (
   oldtag varchar(128) NOT NULL,
   newtag varchar(128) NOT NULL,
