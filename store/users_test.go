@@ -61,6 +61,6 @@ func TestUser(t *testing.T) {
 	// Attempt to get user again and expect no rows err.
 	_, err = shim.GetUser(username)
 	if got, want := err, sql.ErrNoRows; got != want {
-		t.Errorf("GetUser(%q) after delete returned err = %v, want %v", got, want)
+		t.Errorf("GetUser(%q) after delete returned err = %v, want %v", username, got, want)
 	}
 }
