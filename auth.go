@@ -12,6 +12,12 @@ import (
 	"time"
 )
 
+type contextKey int
+
+const (
+	userContextKey contextKey = iota
+)
+
 // Hash returns the MD5 checksum of a string s as type string.
 func Hash(s string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
@@ -69,9 +75,21 @@ func (shim *Shimmie) Auth(fn http.HandlerFunc, redirectURL string) http.HandlerF
 			http.Redirect(w, r, redirectURL, http.StatusFound)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "user", user)
+		ctx := NewContextWithUser(r.Context(), user)
 		fn(w, r.WithContext(ctx))
 	}
+}
+
+// FromContextGetUser gets User from context. If User does not exist in context,
+// nil and false are returned instead.
+func FromContextGetUser(ctx context.Context) (*User, bool) {
+	user, ok := ctx.Value(userContextKey).(*User)
+	return user, ok
+}
+
+// NewContextWithUser adds user to context.
+func NewContextWithUser(ctx context.Context, user *User) context.Context {
+	return context.WithValue(ctx, userContextKey, user)
 }
 
 // GetOriginalIP gets the original IP of the HTTP for the case of being behind
