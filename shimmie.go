@@ -89,6 +89,13 @@ type Store interface {
 	// used to fetch data for the "Tag Approval" page.
 	GetContributedTagHistory(imageOwnerUsername string) ([]ContributedTagHistory, error)
 
+	// GetAlias returns an alias based on its old tag.
+	GetAlias(oldTag string) (*Alias, error)
+	// CreateAlias creates a new alias.
+	CreateAlias(alias *Alias) error
+	// DeleteAlias deletes an alias based on its old tag.
+	DeleteAlias(oldTag string) error
+
 	// Close closes the connection with the database.
 	Close() error
 }
@@ -190,4 +197,10 @@ type ContributedTagHistory struct {
 	TaggerIP   string
 	Tags       string
 	DateSet    *time.Time
+}
+
+// Alias is an alias of an old tag to a new tag.
+type Alias struct {
+	OldTag string
+	NewTag string
 }
