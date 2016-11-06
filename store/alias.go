@@ -33,10 +33,54 @@ func (db datastore) CreateAlias(alias *shimmie.Alias) error {
 		return err
 	}
 	_, err = stmt.Exec(alias.NewTag, alias.OldTag)
+	return err
+}
+
+func (db datastore) CountAlias() (int, error) {
+	var (
+		count int
+	)
+	err := db.QueryRow(aliasCountQuery).Scan(&count)
 	if err != nil {
-		return err
+		return -1, err
 	}
-	return nil
+	return count, nil
+}
+
+func (db *datastore) GetAllAlias(limit, offset int) ([]shimmie.Alias, error) {
+	if limit < 0 {
+		count, cerr := db.CountAlias()
+		if cerr != nil {
+			return nil, cerr
+		}
+		limit = count
+	}
+	rows, err := db.Query(aliasGetAllQuery, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if cerr := rows.Close(); err == nil {
+			err = cerr
+			return
+		}
+	}()
+
+	var (
+		a     shimmie.Alias
+		alias []shimmie.Alias
+	)
+	for rows.Next() {
+		err = rows.Scan(
+			&a.OldTag,
+			&a.NewTag,
+		)
+		if err != nil {
+			return nil, err
+		}
+		alias = append(alias, a)
+	}
+	return alias, err
 }
 
 const (
@@ -57,4 +101,13 @@ SET
   newtag = ?,
   oldtag = ?
 `
+
+	aliasCountQuery = `
+SELECT COUNT(*)
+FROM aliases
+`
+	aliasGetAllQuery = `
+SELECT *
+FROM aliases
+LIMIT ? OFFSET ?`
 )

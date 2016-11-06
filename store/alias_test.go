@@ -2,6 +2,7 @@ package store_test
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"reflect"
 	"testing"
@@ -52,6 +53,15 @@ func TestAlias(t *testing.T) {
 		t.Errorf("GetAlias(%q) -> %q, want %q", oldTag, got, want)
 	}
 
+	// Count created alias and find only 1.
+	count, err := shim.CountAlias()
+	if err != nil {
+		t.Errorf("CountAlias() returned err: %v", err)
+	}
+	if got, want := count, 1; got != want {
+		t.Errorf("CountAlias() -> count = %d, want %d", got, want)
+	}
+
 	// Deleted created alias.
 	if err := shim.DeleteAlias(oldTag); err != nil {
 		t.Errorf("DeleteAlias(%d) returned err: %v", oldTag, err)
@@ -63,4 +73,58 @@ func TestAlias(t *testing.T) {
 		t.Errorf("GetAlias(%q) after delete returned err = %v, want %v", oldTag, got, want)
 	}
 
+}
+
+func TestGetAllAlias(t *testing.T) {
+	schema := setup()
+	defer teardown(schema)
+	shim := store.Open(*driverName, *dataSourceName)
+	defer func() {
+		if cerr := shim.Close(); cerr != nil {
+			log.Println("failed to close connection")
+		}
+	}()
+
+	newTag, max := "old_tag", 10
+	for i := 0; i < max; i++ {
+		a := &shimmie.Alias{
+			OldTag: fmt.Sprintf("old_tag%d", i),
+			NewTag: newTag,
+		}
+		err := shim.CreateAlias(a)
+		if err != nil {
+			t.Fatalf("CreateAlias(%q) returned err: %v", a, err)
+		}
+	}
+
+	// Get all alias with limit and offset.
+	limit, offset := 5, 0
+	alias, err := shim.GetAllAlias(limit, offset)
+	if err != nil {
+		t.Fatalf("GetAllAlias(%d, %d) returned err: %v", limit, offset, err)
+	}
+	if got, want := len(alias), 5; got != want {
+		t.Errorf("GetAllAlias(%d, %d) -> len(alias) = %d, want %d", limit, offset, got, want)
+	}
+
+	// Get all alias in the database by providing a negative limit.
+	limit, offset = -1, 8
+	alias, err = shim.GetAllAlias(limit, offset)
+	if err != nil {
+		t.Fatalf("GetAllAlias(%d, %d) returned err: %v", limit, offset, err)
+	}
+	if got, want := len(alias), 2; got != want {
+		t.Errorf("GetAllAlias(%d, %d) -> len(alias) = %d, want %d", limit, offset, got, want)
+	}
+
+	// Get all alias with offset tht exceeds the number of entries should
+	// return 0 length.
+	limit, offset = 10, 20
+	alias, err = shim.GetAllAlias(limit, offset)
+	if err != nil {
+		t.Fatalf("GetAllAlias(%d, %d) returned err: %v", limit, offset, err)
+	}
+	if got, want := len(alias), 0; got != want {
+		t.Errorf("GetAllAlias(%d, %d) -> len(alias) = %d, want %d", limit, offset, got, want)
+	}
 }
