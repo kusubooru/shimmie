@@ -64,7 +64,7 @@ func (db *datastore) CreateUser(u *shimmie.User) error {
 	// Executing an extra statement in order to get the value of JoinDate as
 	// its value is created by the database with NOW(). Creating the value of
 	// JoinDate with time.Now() beforehand, results in slightly different dates
-	// as time.Time has 9 point decimal precision while mySQL DATETIME has 6 at
+	// as time.Time has 9 point decimal precision while MySQL DATETIME has 6 at
 	// max.
 	//
 	// If a better solution for getting the JoinDate value can be found then we

@@ -128,3 +128,49 @@ func TestGetAllAlias(t *testing.T) {
 		t.Errorf("GetAllAlias(%d, %d) -> len(alias) = %d, want %d", limit, offset, got, want)
 	}
 }
+
+func TestFindAlias(t *testing.T) {
+	schema := setup()
+	defer teardown(schema)
+	shim := store.Open(*driverName, *dataSourceName)
+	defer func() {
+		if cerr := shim.Close(); cerr != nil {
+			log.Println("failed to close connection")
+		}
+	}()
+
+	alias := []shimmie.Alias{
+		{NewTag: "character:sarah_fortune", OldTag: "character:miss_fortune"},
+		{NewTag: "character:sarah_fortune", OldTag: "miss_fortune"},
+		{NewTag: "character:sarah_fortune", OldTag: "miss_fortune_the_bounty_hunter"},
+		{NewTag: "character:sarah_fortune", OldTag: "Miss_Forturne_(lol)"},
+		{NewTag: "character:sarah_fortune", OldTag: "sarah_fortune"},
+	}
+	for _, a := range alias {
+		err := shim.CreateAlias(&a)
+		if err != nil {
+			t.Fatalf("CreateAlias(%q) returned err: %v", a, err)
+		}
+	}
+
+	tests := []struct {
+		oldTag  string
+		newTag  string
+		matches int
+	}{
+		{"", "fortune", 5},
+		{"miss", "", 4}, // 4 because it also finds Miss.
+		{"character", "character", 1},
+		{"", "", 5},
+	}
+
+	for _, tt := range tests {
+		res, err := shim.FindAlias(tt.oldTag, tt.newTag)
+		if err != nil {
+			t.Fatalf("FindAlias(%q, %q) returned err: %v", tt.oldTag, tt.newTag, err)
+		}
+		if got, want := len(res), tt.matches; got != want {
+			t.Errorf("FindAlias(%q, %q) len(result) = %d, want %d", tt.oldTag, tt.newTag, got, want)
+		}
+	}
+}

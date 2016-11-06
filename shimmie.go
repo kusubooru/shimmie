@@ -103,6 +103,8 @@ type Store interface {
 	// case. For example, assuming 10 entries, GetAllAlias(-1, 0), will return
 	// all 10 entries and GetAllAlias(-1, 8) will return the last 2 entries.
 	GetAllAlias(limit, offset int) ([]Alias, error)
+	// FindAlias returns all alias matching an oldTag or a newTag or both.
+	FindAlias(oldTag, newTag string) ([]Alias, error)
 
 	// Close closes the connection with the database.
 	Close() error

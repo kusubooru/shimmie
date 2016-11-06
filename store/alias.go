@@ -2,7 +2,7 @@ package store
 
 import "github.com/kusubooru/shimmie"
 
-func (db datastore) GetAlias(oldTag string) (*shimmie.Alias, error) {
+func (db *datastore) GetAlias(oldTag string) (*shimmie.Alias, error) {
 	var (
 		a shimmie.Alias
 	)
@@ -16,7 +16,7 @@ func (db datastore) GetAlias(oldTag string) (*shimmie.Alias, error) {
 	return &a, nil
 }
 
-func (db datastore) DeleteAlias(oldTag string) error {
+func (db *datastore) DeleteAlias(oldTag string) error {
 	stmt, err := db.Prepare(aliasDeleteStmt)
 	if err != nil {
 		return err
@@ -27,7 +27,7 @@ func (db datastore) DeleteAlias(oldTag string) error {
 	return nil
 }
 
-func (db datastore) CreateAlias(alias *shimmie.Alias) error {
+func (db *datastore) CreateAlias(alias *shimmie.Alias) error {
 	stmt, err := db.Prepare(aliasInsertStmt)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func (db datastore) CreateAlias(alias *shimmie.Alias) error {
 	return err
 }
 
-func (db datastore) CountAlias() (int, error) {
+func (db *datastore) CountAlias() (int, error) {
 	var (
 		count int
 	)
@@ -83,12 +83,42 @@ func (db *datastore) GetAllAlias(limit, offset int) ([]shimmie.Alias, error) {
 	return alias, err
 }
 
+func (db *datastore) FindAlias(oldTag, newTag string) ([]shimmie.Alias, error) {
+	rows, err := db.Query(aliasFindQuery, "%"+oldTag+"%", "%"+newTag+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if cerr := rows.Close(); err == nil {
+			err = cerr
+			return
+		}
+	}()
+
+	var (
+		a     shimmie.Alias
+		alias []shimmie.Alias
+	)
+	for rows.Next() {
+		err = rows.Scan(
+			&a.OldTag,
+			&a.NewTag,
+		)
+		if err != nil {
+			return nil, err
+		}
+		alias = append(alias, a)
+	}
+	return alias, err
+}
+
 const (
 	aliasGetQuery = `
 SELECT *
 FROM aliases
 WHERE oldtag = ?
 `
+
 	aliasDeleteStmt = `
 DELETE
 FROM aliases
@@ -106,8 +136,17 @@ SET
 SELECT COUNT(*)
 FROM aliases
 `
+
 	aliasGetAllQuery = `
 SELECT *
 FROM aliases
-LIMIT ? OFFSET ?`
+LIMIT ? OFFSET ?
+`
+
+	aliasFindQuery = `
+SELECT *
+FROM aliases
+WHERE oldtag like ?
+  AND newtag like ?
+`
 )
