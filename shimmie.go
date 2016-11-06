@@ -95,6 +95,14 @@ type Store interface {
 	CreateAlias(alias *Alias) error
 	// DeleteAlias deletes an alias based on its old tag.
 	DeleteAlias(oldTag string) error
+	// CountAlias returns how many alias entries exit in the database.
+	CountAlias() (int, error)
+	// GetAllAlias returns alias entries of the database based on a limit and
+	// an offset. If limit < 0, CountAlias will also be executed to get the
+	// maximum limit and return all alias entries. Offset still works in this
+	// case. For example, assuming 10 entries, GetAllAlias(-1, 0), will return
+	// all 10 entries and GetAllAlias(-1, 8) will return the last 2 entries.
+	GetAllAlias(limit, offset int) ([]Alias, error)
 
 	// Close closes the connection with the database.
 	Close() error
