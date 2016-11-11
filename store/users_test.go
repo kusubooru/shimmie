@@ -45,12 +45,21 @@ func TestUser(t *testing.T) {
 	}
 
 	// Attempt to get created user and compare.
-	got, err := shim.GetUser(username)
+	got, err := shim.GetUserByName(username)
 	if err != nil {
-		t.Fatalf("GetUser(%q) returned err: %v", username, err)
+		t.Fatalf("GetUserByName(%q) returned err: %v", username, err)
 	}
 	if want := u; !reflect.DeepEqual(got, want) {
-		t.Errorf("GetUser(%q) -> user =\n%#v, want\n%#v", username, got, want)
+		t.Errorf("GetUserByName(%q) -> user =\n%#v, want\n%#v", username, got, want)
+	}
+
+	// Also get user by ID just to test the method.
+	got, err = shim.GetUser(expectedID)
+	if err != nil {
+		t.Fatalf("GetUser(%d) returned err: %v", expectedID, err)
+	}
+	if want := u; !reflect.DeepEqual(got, want) {
+		t.Errorf("GetUser(%d) -> user =\n%#v, want\n%#v", expectedID, got, want)
 	}
 
 	// Delete created user.

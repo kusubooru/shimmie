@@ -56,7 +56,7 @@ func (shim *Shimmie) Auth(fn http.HandlerFunc, redirectURL string) http.HandlerF
 			return
 		}
 		username := usernameCookie.Value
-		user, err := shim.Store.GetUser(username)
+		user, err := shim.Store.GetUserByName(username)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				log.Printf("shimmie: user %q does not exist", username)

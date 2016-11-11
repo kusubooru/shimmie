@@ -51,8 +51,10 @@ type Store interface {
 	// SQLDB returns the encapsulated *sql.DB, mostly used for testing.
 	SQLDB() *sql.DB
 
-	// GetUser gets a user by unique username.
-	GetUser(username string) (*User, error)
+	// GetUser gets a user by ID.
+	GetUser(userID int64) (*User, error)
+	// GetUserByName gets a user by unique username.
+	GetUserByName(username string) (*User, error)
 	// CreateUser creates a new user and returns their ID.
 	CreateUser(*User) error
 	// DeleteUser deletes a user based on their ID.

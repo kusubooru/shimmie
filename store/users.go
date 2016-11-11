@@ -6,13 +6,21 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
-func (db *datastore) GetUser(username string) (*shimmie.User, error) {
+func (db *datastore) GetUser(userID int64) (*shimmie.User, error) {
+	return db.getUserBy(userGetQuery, userID)
+}
+
+func (db *datastore) GetUserByName(username string) (*shimmie.User, error) {
+	return db.getUserBy(userGetByNameQuery, username)
+}
+
+func (db *datastore) getUserBy(query string, id interface{}) (*shimmie.User, error) {
 	var (
 		u     shimmie.User
 		pass  sql.NullString
 		email sql.NullString
 	)
-	err := db.QueryRow(userGetQuery, username).Scan(
+	err := db.QueryRow(query, id).Scan(
 		&u.ID,
 		&u.Name,
 		&pass,
@@ -75,7 +83,7 @@ func (db *datastore) CreateUser(u *shimmie.User) error {
 	//		return err
 	//    }
 	//    u.ID = id
-	storedUser, err := db.GetUser(u.Name)
+	storedUser, err := db.GetUserByName(u.Name)
 	if err != nil {
 		return err
 	}
@@ -86,8 +94,13 @@ func (db *datastore) CreateUser(u *shimmie.User) error {
 
 const (
 	userGetQuery = `
-SELECT * 
-FROM users 
+SELECT *
+FROM users
+WHERE id = ?
+`
+	userGetByNameQuery = `
+SELECT *
+FROM users
 WHERE name = ?
 `
 	userInsertStmt = `
