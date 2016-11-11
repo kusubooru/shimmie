@@ -97,35 +97,28 @@ func TestGetAllAlias(t *testing.T) {
 		}
 	}
 
-	// Get all alias with limit and offset.
-	limit, offset := 5, 0
-	alias, err := shim.GetAllAlias(limit, offset)
-	if err != nil {
-		t.Fatalf("GetAllAlias(%d, %d) returned err: %v", limit, offset, err)
-	}
-	if got, want := len(alias), 5; got != want {
-		t.Errorf("GetAllAlias(%d, %d) -> len(alias) = %d, want %d", limit, offset, got, want)
-	}
-
-	// Get all alias in the database by providing a negative limit.
-	limit, offset = -1, 8
-	alias, err = shim.GetAllAlias(limit, offset)
-	if err != nil {
-		t.Fatalf("GetAllAlias(%d, %d) returned err: %v", limit, offset, err)
-	}
-	if got, want := len(alias), 2; got != want {
-		t.Errorf("GetAllAlias(%d, %d) -> len(alias) = %d, want %d", limit, offset, got, want)
+	var getAllAliasTests = []struct {
+		limit   int
+		offset  int
+		wantLen int
+	}{
+		// Get all alias with limit and offset.
+		{limit: 5, offset: 0, wantLen: 5},
+		// Get all alias in the database by providing a negative limit.
+		{limit: -1, offset: 8, wantLen: 2},
+		// Get all alias with offset that exceeds the number of entries.
+		{limit: 10, offset: 20, wantLen: 0},
 	}
 
-	// Get all alias with offset tht exceeds the number of entries should
-	// return 0 length.
-	limit, offset = 10, 20
-	alias, err = shim.GetAllAlias(limit, offset)
-	if err != nil {
-		t.Fatalf("GetAllAlias(%d, %d) returned err: %v", limit, offset, err)
-	}
-	if got, want := len(alias), 0; got != want {
-		t.Errorf("GetAllAlias(%d, %d) -> len(alias) = %d, want %d", limit, offset, got, want)
+	for _, tt := range getAllAliasTests {
+		limit, offset := tt.limit, tt.offset
+		alias, err := shim.GetAllAlias(limit, offset)
+		if err != nil {
+			t.Fatalf("GetAllAlias(%d, %d) returned err: %v", limit, offset, err)
+		}
+		if got, want := len(alias), tt.wantLen; got != want {
+			t.Errorf("GetAllAlias(%d, %d) -> len(alias) = %d, want %d", limit, offset, got, want)
+		}
 	}
 }
 
