@@ -92,6 +92,70 @@ func (db *datastore) CreateUser(u *shimmie.User) error {
 	return nil
 }
 
+func (db *datastore) CountUsers() (int, error) {
+	return count(db.DB, userCountQuery)
+}
+
+func count(db *sql.DB, query string) (int, error) {
+	var (
+		count int
+	)
+	err := db.QueryRow(query).Scan(&count)
+	if err != nil {
+		return -1, err
+	}
+	return count, nil
+}
+
+func (db *datastore) GetAllUsers(limit, offset int) ([]shimmie.User, error) {
+	if limit < 0 {
+		count, cerr := db.CountUsers()
+		if cerr != nil {
+			return nil, cerr
+		}
+		limit = count
+	}
+	rows, err := db.Query(userGetAllQuery, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if cerr := rows.Close(); err == nil {
+			err = cerr
+			return
+		}
+	}()
+
+	var (
+		u     shimmie.User
+		users []shimmie.User
+		pass  sql.NullString
+		email sql.NullString
+	)
+	for rows.Next() {
+		err = rows.Scan(
+			&u.ID,
+			&u.Name,
+			&pass,
+			&u.JoinDate,
+			&u.Admin,
+			&email,
+			&u.Class,
+		)
+		if err != nil {
+			return nil, err
+		}
+		if pass.Valid {
+			u.Pass = pass.String
+		}
+		if email.Valid {
+			u.Email = email.String
+		}
+		users = append(users, u)
+	}
+	return users, err
+}
+
 const (
 	userGetQuery = `
 SELECT *
@@ -116,5 +180,16 @@ SET
 DELETE
 FROM users
 WHERE id = ?
+`
+
+	userCountQuery = `
+SELECT COUNT(*)
+FROM users
+`
+
+	userGetAllQuery = `
+SELECT *
+FROM users
+LIMIT ? OFFSET ?
 `
 )

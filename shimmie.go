@@ -59,6 +59,14 @@ type Store interface {
 	CreateUser(*User) error
 	// DeleteUser deletes a user based on their ID.
 	DeleteUser(int64) error
+	// CountUsers returns how many user entries exist in the database.
+	CountUsers() (int, error)
+	// GetAllUsers returns user entries of the database based on a limit and
+	// an offset. If limit < 0, CountUsers will also be executed to get the
+	// maximum limit and return all user entries. Offset still works in this
+	// case. For example, assuming 10 entries, GetAllUsers(-1, 0), will return
+	// all 10 entries and GetAllUsers(-1, 8) will return the last 2 entries.
+	GetAllUsers(limit, offset int) ([]User, error)
 
 	// GetConfig gets shimmie config values.
 	GetConfig(keys ...string) (map[string]string, error)
@@ -97,7 +105,7 @@ type Store interface {
 	CreateAlias(alias *Alias) error
 	// DeleteAlias deletes an alias based on its old tag.
 	DeleteAlias(oldTag string) error
-	// CountAlias returns how many alias entries exit in the database.
+	// CountAlias returns how many alias entries exist in the database.
 	CountAlias() (int, error)
 	// GetAllAlias returns alias entries of the database based on a limit and
 	// an offset. If limit < 0, CountAlias will also be executed to get the
