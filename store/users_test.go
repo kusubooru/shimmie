@@ -38,7 +38,7 @@ func TestUser(t *testing.T) {
 	if got, want := u.ID, expectedID; got != want {
 		t.Errorf("CreateUser(%q) -> user.Id = %d, want %d", u, got, want)
 	}
-	if got, want := u.Pass, shimmie.Hash(password); got != want {
+	if got, want := u.Pass, shimmie.PasswordHash(username, password); got != want {
 		t.Errorf("CreateUser(%q) -> user.Pass = %q, want %q", u, got, want)
 	}
 	if got, want := u.Class, "user"; got != want {

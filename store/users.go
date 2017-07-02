@@ -63,7 +63,7 @@ func (db *datastore) CreateUser(u *shimmie.User) error {
 	if u.Admin == "" {
 		u.Admin = "N"
 	}
-	hash := shimmie.Hash(u.Pass)
+	hash := shimmie.PasswordHash(u.Name, u.Pass)
 	_, err = stmt.Exec(u.Name, hash, u.Email, u.Class)
 	if err != nil {
 		return err
