@@ -2,15 +2,8 @@ package store
 
 import (
 	"database/sql"
-	"errors"
 
 	"github.com/kusubooru/shimmie"
-)
-
-// Errors returned by Verify.
-var (
-	ErrWrongCredentials = errors.New("wrong username or password")
-	ErrNotFound         = errors.New("entry not found")
 )
 
 // Verify compares the provided username and password with the username and
@@ -29,12 +22,12 @@ func (db *datastore) Verify(username, password string) (*shimmie.User, error) {
 	u, err := db.GetUserByName(username)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, ErrNotFound
+			return nil, shimmie.ErrNotFound
 		}
 		return nil, err
 	}
 	if u.Pass == shimmie.PasswordHash(username, password) {
 		return u, nil
 	}
-	return nil, ErrWrongCredentials
+	return nil, shimmie.ErrWrongCredentials
 }

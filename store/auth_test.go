@@ -48,7 +48,7 @@ func TestVerify(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Verify(%q, %q) expected to return err", username, password)
 	}
-	if got, want := err, store.ErrWrongCredentials; got != want {
+	if got, want := err, shimmie.ErrWrongCredentials; got != want {
 		t.Errorf("Verify(%q, %q) -> err =\n%#v, want\n%#v", username, password, got, want)
 	}
 
@@ -59,7 +59,7 @@ func TestVerify(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Verify(%q, %q) expected to return err", username, password)
 	}
-	if got, want := err, store.ErrNotFound; got != want {
+	if got, want := err, shimmie.ErrNotFound; got != want {
 		t.Errorf("Verify(%q, %q) -> err =\n%#v, want\n%#v", username, password, got, want)
 	}
 }

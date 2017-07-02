@@ -2,6 +2,7 @@ package shimmie
 
 import (
 	"database/sql"
+	"errors"
 	"io"
 	"strings"
 	"time"
@@ -11,6 +12,12 @@ const (
 	imageRatingSafe         = "Safe"
 	imageRatingQuestionable = "Questionable"
 	imageRatingExplicit     = "Explicit"
+)
+
+// Errors returned by Verify.
+var (
+	ErrWrongCredentials = errors.New("wrong username or password")
+	ErrNotFound         = errors.New("entry not found")
 )
 
 // ImageRating converts rating letters to full words.
