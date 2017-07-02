@@ -1,6 +1,7 @@
 package store
 
 import (
+	"crypto/subtle"
 	"database/sql"
 
 	"github.com/kusubooru/shimmie"
@@ -26,7 +27,9 @@ func (db *datastore) Verify(username, password string) (*shimmie.User, error) {
 		}
 		return nil, err
 	}
-	if u.Pass == shimmie.PasswordHash(username, password) {
+	storedHash := []byte(u.Pass)
+	newHash := []byte(shimmie.PasswordHash(username, password))
+	if subtle.ConstantTimeCompare(storedHash, newHash) == 1 {
 		return u, nil
 	}
 	return nil, shimmie.ErrWrongCredentials
