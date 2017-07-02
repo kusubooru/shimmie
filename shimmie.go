@@ -116,6 +116,10 @@ type Store interface {
 	// FindAlias returns all alias matching an oldTag or a newTag or both.
 	FindAlias(oldTag, newTag string) ([]Alias, error)
 
+	// Verify compares the provided username and password with the username and
+	// password hash stored in the shimmie database.
+	Verify(username, password string) (*User, error)
+
 	// Close closes the connection with the database.
 	Close() error
 }

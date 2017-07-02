@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/md5"
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -19,12 +18,6 @@ const (
 	userContextKey contextKey = iota
 )
 
-// Errors returned by Verify.
-var (
-	ErrWrongCredentials = errors.New("wrong username or password")
-	ErrNotFound         = errors.New("entry not found")
-)
-
 // Hash returns the MD5 checksum of a string s as type string.
 func Hash(s string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
@@ -35,32 +28,6 @@ func Hash(s string) string {
 func PasswordHash(username, password string) string {
 	hash := md5.Sum([]byte(strings.ToLower(username) + password))
 	return fmt.Sprintf("%x", hash)
-}
-
-// Verify compares the provided username and password with the username and
-// password hash stored in the shimmie database.
-//
-// It can return:
-//
-// - The shimmie User on success.
-//
-// - ErrNotFound if the username does not exist.
-//
-// - ErrWrongCredentials if the username and password do not match.
-//
-// - An error if something goes wrong with the database.
-func (shim *Shimmie) Verify(username, password string) (*User, error) {
-	u, err := shim.Store.GetUserByName(username)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, ErrNotFound
-		}
-		return nil, err
-	}
-	if u.Pass == PasswordHash(username, password) {
-		return u, nil
-	}
-	return nil, ErrWrongCredentials
 }
 
 // Auth is a handler wrapper that checks if a user is authenticated to Shimmie.
