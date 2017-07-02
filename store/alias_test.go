@@ -64,7 +64,7 @@ func TestAlias(t *testing.T) {
 
 	// Deleted created alias.
 	if err := shim.DeleteAlias(oldTag); err != nil {
-		t.Errorf("DeleteAlias(%d) returned err: %v", oldTag, err)
+		t.Errorf("DeleteAlias(%q) returned err: %v", oldTag, err)
 	}
 
 	// Attempt to get alias again and expect no rows err.
