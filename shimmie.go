@@ -127,6 +127,15 @@ type Store interface {
 	// password hash stored in the shimmie database.
 	Verify(username, password string) (*User, error)
 
+	CreateTag(*Tag) error
+	DeleteTag(name string) error
+	GetTag(name string) (*Tag, error)
+	GetAllTags(limit, offset int) ([]*Tag, error)
+
+	// Autocomplete searches tags and tag alias for a term and returns
+	// suggestions tags to be used for a UI autocomplete.
+	Autocomplete(q string, limit, offset int) ([]*Autocomplete, error)
+
 	// Close closes the connection with the database.
 	Close() error
 }
@@ -234,4 +243,19 @@ type ContributedTagHistory struct {
 type Alias struct {
 	OldTag string
 	NewTag string
+}
+
+// Tag is an image's tag.
+type Tag struct {
+	ID    int
+	Tag   string
+	Count int
+}
+
+// Autocomplete is the result of searching into tags and tag alias to give
+// autocomplete suggestions.
+type Autocomplete struct {
+	Old   string `json:"old"`
+	Name  string `json:"name"`
+	Count int    `json:"count"`
 }
