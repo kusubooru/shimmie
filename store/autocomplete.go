@@ -7,7 +7,7 @@ func (db *datastore) Autocomplete(q string, limit, offset int) ([]*shimmie.Autoc
 		return []*shimmie.Autocomplete{}, nil
 	}
 	q = "%" + q + "%"
-	rows, err := db.Query(autocompleteQuery, q, q, q, q, limit, offset)
+	rows, err := db.Query(autocompleteQuery, q, q, q, q, q, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -41,6 +41,8 @@ UNION
 	FROM tags t
 	WHERE t.tag LIKE ? AND t.count > 0 AND t.tag NOT IN (
 			SELECT oldtag from aliases where oldtag like ?
+			UNION
+            SELECT newtag from aliases where newtag like ?
 		)
     )
 ORDER BY count DESC

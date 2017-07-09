@@ -63,7 +63,6 @@ func TestAutocomplete(t *testing.T) {
 
 	expected := []*shimmie.Autocomplete{
 		{Old: "chun-li", Name: "character:chun-li", Count: 5},
-		{Old: "", Name: "character:chun-li", Count: 5},
 		{Old: "", Name: "chun", Count: 1},
 	}
 	if got, want := len(tags), len(expected); got != want {
