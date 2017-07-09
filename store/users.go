@@ -46,6 +46,12 @@ func (db *datastore) DeleteUser(id int64) error {
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if cerr := stmt.Close(); err == nil {
+			err = cerr
+			return
+		}
+	}()
 	if _, err := stmt.Exec(id); err != nil {
 		return err
 	}
@@ -57,6 +63,12 @@ func (db *datastore) CreateUser(u *shimmie.User) error {
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if cerr := stmt.Close(); err == nil {
+			err = cerr
+			return
+		}
+	}()
 	if u.Class == "" {
 		u.Class = "user"
 	}

@@ -16,6 +16,12 @@ func (db *datastore) RateImage(id int, rating string) error {
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if cerr := stmt.Close(); err == nil {
+			err = cerr
+			return
+		}
+	}()
 
 	res, err := stmt.Exec(rating, id)
 	if err != nil {
