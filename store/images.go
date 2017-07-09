@@ -119,12 +119,10 @@ func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, erro
 		}
 	}()
 
-	var (
-		img    shimmie.RatedImage
-		images []shimmie.RatedImage
-	)
+	var images []shimmie.RatedImage
 	for rows.Next() {
 		var (
+			img      shimmie.RatedImage
 			source   sql.NullString
 			parentID sql.NullInt64
 			author   sql.NullString

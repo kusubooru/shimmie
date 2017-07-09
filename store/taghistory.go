@@ -14,11 +14,9 @@ func (db *datastore) GetImageTagHistory(imageID int) ([]shimmie.TagHistory, erro
 		}
 	}()
 
-	var (
-		th  shimmie.TagHistory
-		ths []shimmie.TagHistory
-	)
+	var ths []shimmie.TagHistory
 	for rows.Next() {
+		var th shimmie.TagHistory
 		err := rows.Scan(
 			&th.ID,
 			&th.ImageID,
@@ -64,11 +62,9 @@ func (db *datastore) GetContributedTagHistory(imageOwnerUsername string) ([]shim
 		}
 	}()
 
-	var (
-		th  shimmie.ContributedTagHistory
-		ths []shimmie.ContributedTagHistory
-	)
+	var ths []shimmie.ContributedTagHistory
 	for rows.Next() {
+		var th shimmie.ContributedTagHistory
 		err := rows.Scan(
 			&th.ID,
 			&th.ImageID,

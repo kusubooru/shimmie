@@ -126,13 +126,13 @@ func (db *datastore) GetAllUsers(limit, offset int) ([]shimmie.User, error) {
 		}
 	}()
 
-	var (
-		u     shimmie.User
-		users []shimmie.User
-		pass  sql.NullString
-		email sql.NullString
-	)
+	var users []shimmie.User
 	for rows.Next() {
+		var (
+			u     shimmie.User
+			pass  sql.NullString
+			email sql.NullString
+		)
 		err = rows.Scan(
 			&u.ID,
 			&u.Name,

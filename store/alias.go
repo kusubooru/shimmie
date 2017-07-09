@@ -66,11 +66,9 @@ func (db *datastore) GetAllAlias(limit, offset int) ([]shimmie.Alias, error) {
 		}
 	}()
 
-	var (
-		a     shimmie.Alias
-		alias []shimmie.Alias
-	)
+	var alias []shimmie.Alias
 	for rows.Next() {
+		var a shimmie.Alias
 		err = rows.Scan(
 			&a.OldTag,
 			&a.NewTag,
@@ -95,11 +93,9 @@ func (db *datastore) FindAlias(oldTag, newTag string) ([]shimmie.Alias, error) {
 		}
 	}()
 
-	var (
-		a     shimmie.Alias
-		alias []shimmie.Alias
-	)
+	var alias []shimmie.Alias
 	for rows.Next() {
+		var a shimmie.Alias
 		err = rows.Scan(
 			&a.OldTag,
 			&a.NewTag,
