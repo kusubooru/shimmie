@@ -193,26 +193,44 @@ const (
 	// Warning: MySQL specific query.
 	imageGetRatedQuery = `
 SELECT
-  img.*, rater, rater_ip, rate_date
-FROM images as img, (
-  SELECT 
-    max(log_id) as max_log_id, rated_id, rater_ip, rater, rate_date
-  FROM (
+  img.*,
+  rater,
+  rater_ip,
+  rate_date
+FROM
+  images AS img,
+  (
     SELECT
-	  score_log.id as log_id,
-      SUBSTRING_INDEX(SUBSTRING_INDEX(message, '#', -1), ' ', 1) AS rated_id,
-      score_log.address as rater_ip,
-      score_log.username as rater,
-      score_log.date_sent as rate_date
-    FROM score_log
-    WHERE message LIKE "%set to: Safe"
-    AND section = "rating"
-    ORDER BY log_id DESC) as safe
-  GROUP BY rated_id
-  ORDER by max_log_id desc) as latest_safe
-WHERE img.id = latest_safe.rated_id
-AND rating = 's'
-AND rater != ?
+      latest_safe.max_log_id AS max_log_id,
+      latest_safe.rated_id AS rated_id,
+      log.address AS rater_ip,
+      log.username AS rater,
+      log.date_sent AS rate_date
+    FROM
+      (
+        SELECT
+          MAX(score_log.id) AS max_log_id,
+          SUBSTRING_INDEX(SUBSTRING_INDEX(message, '#', - 1), ' ', 1) AS rated_id
+        FROM
+          score_log
+        WHERE
+          message LIKE '%set to: Safe'
+          AND section = 'rating'
+        GROUP BY
+          rated_id
+        ORDER BY
+          max_log_id DESC
+      )
+      AS latest_safe,
+      score_log AS log
+    WHERE
+      latest_safe.max_log_id = log.id
+  )
+  AS safe
+WHERE
+  img.id = safe.rated_id
+  AND rating = 's'
+  AND rater != ?
 `
 
 	imageGetQuery = `
