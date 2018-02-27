@@ -86,6 +86,7 @@ var createStatements = []string{
 	tagHistoriesCreateTableStmt,
 	imageTagsCreateTableStmt,
 	aliasesCreateTableStmt,
+	privateMessageTableStmt,
 }
 
 var alterStatements = []string{}
@@ -162,5 +163,22 @@ CREATE TABLE IF NOT EXISTS aliases (
   PRIMARY KEY (oldtag),
   INDEX newtag (newtag)
 );
+`
+	privateMessageTableStmt = `
+CREATE TABLE IF NOT EXISTS private_message (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  from_id int(11) NOT NULL,
+  from_ip char(15) NOT NULL,
+  to_id int(11) NOT NULL,
+  sent_date datetime NOT NULL,
+  subject varchar(64) NOT NULL,
+  message text NOT NULL,
+  is_read enum('Y','N') NOT NULL DEFAULT 'N',
+  PRIMARY KEY (id),
+  KEY to_id (to_id),
+  KEY from_id (from_id),
+  CONSTRAINT private_message_ibfk_1 FOREIGN KEY (from_id) REFERENCES users (id) ON DELETE CASCADE,
+  CONSTRAINT private_message_ibfk_2 FOREIGN KEY (to_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 `
 )

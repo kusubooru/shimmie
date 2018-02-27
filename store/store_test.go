@@ -3,7 +3,7 @@ package store_test
 import (
 	"flag"
 	"fmt"
-	"log"
+	"testing"
 
 	"github.com/kusubooru/shimmie"
 	"github.com/kusubooru/shimmie/store"
@@ -33,20 +33,25 @@ func init() {
 	flag.Parse()
 }
 
-func setup() shimmie.Schemer {
+func setup(t *testing.T) (shimmie.Store, shimmie.Schemer) {
 	schema := store.NewSchemer(*driverName, *username, *password, *host, *port)
 	err := schema.Create(*testDBName)
 	if err != nil {
-		log.Printf("failed to create schema for %s: %v", *testDBName, err)
+		t.Fatalf("failed to create schema for %s: %v", *testDBName, err)
 	}
-	return schema
+	shim := store.Open(*driverName, *dataSourceName)
+	return shim, schema
 }
 
-func teardown(schema shimmie.Schemer) {
+func teardown(t *testing.T, shim shimmie.Store, schema shimmie.Schemer) {
+	if err := shim.Close(); err != nil {
+		t.Errorf("error closing shimmie connection: %v", err)
+	}
+
 	if err := schema.Drop(*testDBName); err != nil {
-		log.Println(err)
+		t.Errorf("error dropping schema: %v", err)
 	}
 	if err := schema.Close(); err != nil {
-		log.Println(err)
+		t.Errorf("error closing schema connection: %v", err)
 	}
 }

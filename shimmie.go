@@ -136,6 +136,13 @@ type Store interface {
 	// suggestions tags to be used for a UI autocomplete.
 	Autocomplete(q string, limit, offset int) ([]*Autocomplete, error)
 
+	// CreatePM inserts a new private message.
+	CreatePM(pm *PM) error
+	// GetPMs returns the private messages exchanged from a user to
+	// another user. The arguments from and to are user names and either or
+	// both can be left empty.
+	GetPMs(from, to string, choice PMChoice) ([]*PM, error)
+
 	// Close closes the connection with the database.
 	Close() error
 }
@@ -258,4 +265,26 @@ type Autocomplete struct {
 	Old   string `json:"old"`
 	Name  string `json:"name"`
 	Count int    `json:"count"`
+}
+
+type PMChoice int
+
+const (
+	PMAny PMChoice = iota
+	PMRead
+	PMUnread
+)
+
+// PM is a private message exchanged between users.
+type PM struct {
+	FromUser string    `json:"from_user"`
+	ToUser   string    `json:"to_user"`
+	ID       int64     `json:"id"`
+	FromID   int64     `json:"from_id"`
+	FromIP   string    `json:"from_ip"`
+	ToID     int64     `json:"to_id"`
+	SentDate time.Time `json:"sent_date"`
+	Subject  string    `json:"subject"`
+	Message  string    `json:"message"`
+	IsRead   bool      `json:"is_read"`
 }

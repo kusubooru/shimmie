@@ -1,23 +1,15 @@
 package store_test
 
 import (
-	"log"
 	"reflect"
 	"testing"
 
 	"github.com/kusubooru/shimmie"
-	"github.com/kusubooru/shimmie/store"
 )
 
 func TestVerify(t *testing.T) {
-	schema := setup()
-	defer teardown(schema)
-	shim := store.Open(*driverName, *dataSourceName)
-	defer func() {
-		if cerr := shim.Close(); cerr != nil {
-			log.Println("failed to close connection")
-		}
-	}()
+	shim, schema := setup(t)
+	defer teardown(t, shim, schema)
 
 	username := "john"
 	password := "1234"

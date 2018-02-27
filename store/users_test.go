@@ -3,23 +3,15 @@ package store_test
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"reflect"
 	"testing"
 
 	"github.com/kusubooru/shimmie"
-	"github.com/kusubooru/shimmie/store"
 )
 
 func TestUser(t *testing.T) {
-	schema := setup()
-	defer teardown(schema)
-	shim := store.Open(*driverName, *dataSourceName)
-	defer func() {
-		if cerr := shim.Close(); cerr != nil {
-			log.Println("failed to close connection")
-		}
-	}()
+	shim, schema := setup(t)
+	defer teardown(t, shim, schema)
 
 	username := "john"
 	password := "1234"
@@ -76,14 +68,8 @@ func TestUser(t *testing.T) {
 }
 
 func TestGetAllUsers(t *testing.T) {
-	schema := setup()
-	defer teardown(schema)
-	shim := store.Open(*driverName, *dataSourceName)
-	defer func() {
-		if cerr := shim.Close(); cerr != nil {
-			log.Println("failed to close connection")
-		}
-	}()
+	shim, schema := setup(t)
+	defer teardown(t, shim, schema)
 
 	pass, max := "123", 10
 	for i := 0; i < max; i++ {

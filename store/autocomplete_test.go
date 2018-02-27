@@ -3,23 +3,15 @@ package store_test
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"reflect"
 	"testing"
 
 	"github.com/kusubooru/shimmie"
-	"github.com/kusubooru/shimmie/store"
 )
 
 func TestAutocomplete(t *testing.T) {
-	schema := setup()
-	defer teardown(schema)
-	shim := store.Open(*driverName, *dataSourceName)
-	defer func() {
-		if cerr := shim.Close(); cerr != nil {
-			log.Println("failed to close connection")
-		}
-	}()
+	shim, schema := setup(t)
+	defer teardown(t, shim, schema)
 
 	// Test that searching with empty query returns empty results.
 	empty := ""
