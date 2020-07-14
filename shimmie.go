@@ -288,3 +288,14 @@ type PM struct {
 	Message  string    `json:"message"`
 	IsRead   bool      `json:"is_read"`
 }
+
+// UserScore can be used to hold user scores like who has uploaded the most
+// images and who has edited the most tags.
+type UserScore struct {
+	Score    int        `json:"score"`
+	ID       int64      `json:"id"`
+	Name     string     `json:"name"`
+	JoinDate *time.Time `json:"join_date"`
+	Email    string     `json:"email"`
+	Class    string     `json:"class"`
+}
