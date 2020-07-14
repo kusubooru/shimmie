@@ -29,10 +29,6 @@ var (
 	dataSourceName    = flag.String("datasource", defaultDataSource, "database data source")
 )
 
-func init() {
-	flag.Parse()
-}
-
 func setup(t *testing.T) (shimmie.Store, shimmie.Schemer) {
 	schema := store.NewSchemer(*driverName, *username, *password, *host, *port)
 	err := schema.Create(*testDBName)
