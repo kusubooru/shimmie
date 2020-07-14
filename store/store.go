@@ -50,7 +50,7 @@ func pingDatabase(db *sql.DB) (err error) {
 		if err == nil {
 			return
 		}
-		log.Print("database ping failed. retry in 1s")
+		log.Printf("database ping failed, retry in 1s: %v", err)
 		time.Sleep(time.Second)
 	}
 	return
