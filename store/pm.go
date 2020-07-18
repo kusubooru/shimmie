@@ -6,7 +6,7 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
-func (db *datastore) CreatePM(pm *shimmie.PM) error {
+func (db *Datastore) CreatePM(pm *shimmie.PM) error {
 	if pm == nil {
 		return fmt.Errorf("cannot create nil private message")
 	}
@@ -59,7 +59,7 @@ func (db *datastore) CreatePM(pm *shimmie.PM) error {
 	return nil
 }
 
-func (db *datastore) GetPMs(from, to string, choice shimmie.PMChoice) ([]*shimmie.PM, error) {
+func (db *Datastore) GetPMs(from, to string, choice shimmie.PMChoice) ([]*shimmie.PM, error) {
 	var query = `
 SELECT 
     from_user.name from_user, to_user.name to_user, pm.*

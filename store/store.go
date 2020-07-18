@@ -8,35 +8,30 @@ import (
 
 	// mysql driver
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/kusubooru/shimmie"
 )
 
-type datastore struct {
+type Datastore struct {
 	*sql.DB
 }
 
-func (db datastore) SQLDB() *sql.DB {
-	return db.DB
-}
-
 // Open creates a database connection for the given driver and configuration.
-func Open(driver, config string) shimmie.Store {
-	db := openDB(driver, config)
-	return &datastore{db}
+func Open(config string, pingRetries int) *Datastore {
+	db := openDB(config, pingRetries)
+	return &Datastore{db}
 }
 
 // openDB opens a new database connection with the specified driver and
 // connection string.
-func openDB(driver, config string) *sql.DB {
-	db, err := sql.Open(driver, config)
+func openDB(config string, pingRetries int) *sql.DB {
+	db, err := sql.Open("mysql", config)
 	if err != nil {
 		log.Fatalln("database connection failed:", err)
 	}
-	if driver == "mysql" {
-		// per issue https://github.com/go-sql-driver/mysql/issues/257
-		db.SetMaxIdleConns(0)
-	}
-	if err := pingDatabase(db); err != nil {
+
+	// per issue https://github.com/go-sql-driver/mysql/issues/257
+	db.SetMaxIdleConns(0)
+
+	if err := pingDatabase(db, pingRetries); err != nil {
 		log.Fatalln("database ping attempts failed:", err)
 	}
 	return db
@@ -44,19 +39,19 @@ func openDB(driver, config string) *sql.DB {
 
 // helper function to ping the database with backoff to ensure a connection can
 // be established before we proceed.
-func pingDatabase(db *sql.DB) (err error) {
-	for i := 0; i < 10; i++ {
+func pingDatabase(db *sql.DB, pingRetries int) (err error) {
+	for i := 0; i < pingRetries; i++ {
 		err = db.Ping()
 		if err == nil {
 			return
 		}
-		log.Printf("database ping failed, retry in 1s: %v", err)
+		//log.Printf("database ping failed, retry in 1s: %v", err)
 		time.Sleep(time.Second)
 	}
 	return
 }
 
-func (db datastore) Close() error {
+func (db Datastore) Close() error {
 	return db.DB.Close()
 }
 

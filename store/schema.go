@@ -1,57 +1,87 @@
 package store
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/kusubooru/shimmie"
 )
 
-type schema struct {
+type Schema struct {
 	*sql.DB
 }
 
 // NewSchemer returns an implementation of Schemer that allows to easily create
 // and drop the database schema.
-func NewSchemer(driverName, username, password, host, port string) shimmie.Schemer {
-	db := connect(driverName, username, password, host, port)
-	return &schema{db}
+func NewSchemer(driverName, username, password, host, port, dbName string, pingRetries int) *Schema {
+	db := connect(driverName, username, password, host, port, dbName, pingRetries)
+	return &Schema{db}
 }
 
-func connect(driverName, username, password, host, port string) *sql.DB {
-	dataSourceName := fmt.Sprintf("%s:%s@(%s:%s)/?parseTime=true", username, password, host, port)
-	return openDB(driverName, dataSourceName)
+func connect(driverName, username, password, host, port, dbName string, pingRetries int) *sql.DB {
+	dataSourceName := fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true&multiStatements=true", username, password, host, port, dbName)
+	return openDB(dataSourceName, pingRetries)
 }
 
-func (db schema) Create(dbName string) error {
+func (db Schema) Create(dbName string) error {
 	return Tx(db.DB, func(tx *sql.Tx) error {
-		if _, err := tx.Exec(fmt.Sprintf("CREATE DATABASE %s;", dbName)); err != nil {
-			return fmt.Errorf("could not create db: %s", err)
-		}
-
-		if _, err := tx.Exec(fmt.Sprintf("USE %s;", dbName)); err != nil {
-			return fmt.Errorf("could not select db: %s", err)
-		}
-
 		if query, err := createSchema(tx); err != nil {
-			return fmt.Errorf("failed to execute query:\n\n  %q\n\n  Reason:\n\n  %v\n", query, err)
+			return fmt.Errorf("failed to execute query:\n%s\nReason: %v", query, err)
 		}
 		return nil
 	})
 }
 
-func (db schema) Drop(dbName string) error {
-	return Tx(db.DB, func(tx *sql.Tx) error {
-		if _, err := tx.Exec(fmt.Sprintf("DROP DATABASE %s;", dbName)); err != nil {
-			return fmt.Errorf("could not drop db %s: %v", dbName, err)
-		}
-		return nil
-	})
+func (db Schema) Wait(pingRetries int) error {
+	return pingDatabase(db.DB, pingRetries)
 }
 
-func (db schema) Close() error {
-	return db.DB.Close()
+func (db Schema) allTables(ctx context.Context, dbName string) ([]string, error) {
+	const q = `
+	SELECT table_name
+	FROM information_schema.tables
+	WHERE table_schema=?;`
+
+	rows, err := db.DB.QueryContext(ctx, q, dbName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ss := []string{}
+	for rows.Next() {
+		var s string
+		err = rows.Scan(&s)
+		if err != nil {
+			return nil, err
+		}
+		ss = append(ss, s)
+	}
+	return ss, rows.Err()
+
+}
+
+func (db Schema) TruncateTables(ctx context.Context, dbName string) error {
+	tables, err := db.allTables(ctx, dbName)
+	if err != nil {
+		return fmt.Errorf("fetching all tables: %v", err)
+	}
+
+	b := strings.Builder{}
+	b.WriteString("SET FOREIGN_KEY_CHECKS=0;\n")
+	for _, t := range tables {
+		b.WriteString(fmt.Sprintf("TRUNCATE TABLE %s;\n", t))
+	}
+	b.WriteString("SET FOREIGN_KEY_CHECKS=1;")
+
+	query := b.String()
+	_, err = db.ExecContext(ctx, query)
+	if err != nil {
+		return fmt.Errorf("truncating all tables using query:\n%s\nResult: %v", query, err)
+	}
+	return nil
 }
 
 // MySQL specific error for when we try to run alter queries to add new a
@@ -97,7 +127,7 @@ CREATE TABLE IF NOT EXISTS users (
 	id INTEGER NOT NULL AUTO_INCREMENT,
 	name VARCHAR(32) NOT NULL,
 	pass VARCHAR(250),
-	joindate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	joindate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	admin enum('Y','N') NOT NULL DEFAULT 'N',
 	class VARCHAR(32) NOT NULL DEFAULT 'user',
 	email VARCHAR(128),
@@ -117,7 +147,7 @@ CREATE TABLE IF NOT EXISTS images (
 	source VARCHAR(255),
 	width INTEGER NOT NULL,
 	height INTEGER NOT NULL,
-	posted DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	posted TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	locked enum('Y','N') NOT NULL DEFAULT 'N',
 	PRIMARY KEY (id),
 	FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE RESTRICT

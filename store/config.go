@@ -14,7 +14,7 @@ const (
 	configKeyAnalyticsIDOld = "ga_profile_id"
 )
 
-func (db *datastore) GetCommon() (*shimmie.Common, error) {
+func (db *Datastore) GetCommon() (*shimmie.Common, error) {
 	keys := []string{
 		configKeyTitle,
 		configKeyDescription,
@@ -38,7 +38,7 @@ func (db *datastore) GetCommon() (*shimmie.Common, error) {
 	return &conf, nil
 }
 
-func (db *datastore) GetConfig(keys ...string) (map[string]string, error) {
+func (db *Datastore) GetConfig(keys ...string) (map[string]string, error) {
 	query := fmt.Sprint(configGetQuery)
 	if len(keys) != 0 {
 		query = fmt.Sprintf("%vWHERE\n", query)

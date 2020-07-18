@@ -11,7 +11,7 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
-func (db *datastore) RateImage(id int, rating string) error {
+func (db *Datastore) RateImage(id int, rating string) error {
 	stmt, err := db.Prepare(imageUpdateRatingStmt)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (db *datastore) RateImage(id int, rating string) error {
 	return err
 }
 
-func (db *datastore) GetImage(id int) (*shimmie.Image, error) {
+func (db *Datastore) GetImage(id int) (*shimmie.Image, error) {
 
 	var (
 		img      shimmie.Image
@@ -78,7 +78,7 @@ func (db *datastore) GetImage(id int) (*shimmie.Image, error) {
 	return &img, nil
 }
 
-func (db *datastore) WriteImageFile(w io.Writer, path, hash string) error {
+func (db *Datastore) WriteImageFile(w io.Writer, path, hash string) error {
 	// Each image has a hash and it's file is stored under a path (one for the
 	// images and one for the thumbs), under a folder which begins with the
 	// first two letters of the hash.
@@ -113,7 +113,7 @@ func (db *datastore) WriteImageFile(w io.Writer, path, hash string) error {
 	return err
 }
 
-func (db *datastore) GetRatedImages(username string) ([]shimmie.RatedImage, error) {
+func (db *Datastore) GetRatedImages(username string) ([]shimmie.RatedImage, error) {
 	rows, err := db.Query(imageGetRatedQuery, username)
 	if err != nil {
 		return nil, err

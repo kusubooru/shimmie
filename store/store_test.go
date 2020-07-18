@@ -1,20 +1,20 @@
 package store_test
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"testing"
 
-	"github.com/kusubooru/shimmie"
 	"github.com/kusubooru/shimmie/store"
 )
 
 const (
-	defaultUsername     = "kusubooru"
-	defaultPassword     = "kusubooru"
-	defaultHost         = "localhost"
+	defaultUsername     = "shimmie"
+	defaultPassword     = "shimmie"
+	defaultHost         = "127.0.0.1"
 	defaultPort         = "3306"
-	defaultTestDatabase = "kusubooru_test"
+	defaultTestDatabase = "shimmie"
 	defaultDriver       = "mysql"
 )
 
@@ -29,25 +29,23 @@ var (
 	dataSourceName    = flag.String("datasource", defaultDataSource, "database data source")
 )
 
-func setup(t *testing.T) (shimmie.Store, shimmie.Schemer) {
-	schema := store.NewSchemer(*driverName, *username, *password, *host, *port)
-	err := schema.Create(*testDBName)
+func setup(t *testing.T) (*store.Datastore, *store.Schema) {
+	schema := store.NewSchemer(*driverName, *username, *password, *host, *port, *testDBName, 0)
+	err := schema.DB.Ping()
+	if err != nil {
+		t.Fatalf("make sure database is up: use docker-compose up -d: %v", err)
+	}
+
+	err = schema.Create(*testDBName)
 	if err != nil {
 		t.Fatalf("failed to create schema for %s: %v", *testDBName, err)
 	}
-	shim := store.Open(*driverName, *dataSourceName)
+	shim := store.Open(*dataSourceName, 10)
 	return shim, schema
 }
 
-func teardown(t *testing.T, shim shimmie.Store, schema shimmie.Schemer) {
-	if err := shim.Close(); err != nil {
-		t.Errorf("error closing shimmie connection: %v", err)
-	}
-
-	if err := schema.Drop(*testDBName); err != nil {
-		t.Errorf("error dropping schema: %v", err)
-	}
-	if err := schema.Close(); err != nil {
-		t.Errorf("error closing schema connection: %v", err)
+func teardown(t *testing.T, shim *store.Datastore, schema *store.Schema) {
+	if err := schema.TruncateTables(context.Background(), *testDBName); err != nil {
+		t.Errorf("error truncating tables: %v", err)
 	}
 }

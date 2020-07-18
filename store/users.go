@@ -6,15 +6,15 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
-func (db *datastore) GetUser(userID int64) (*shimmie.User, error) {
+func (db *Datastore) GetUser(userID int64) (*shimmie.User, error) {
 	return db.getUserBy(userGetQuery, userID)
 }
 
-func (db *datastore) GetUserByName(username string) (*shimmie.User, error) {
+func (db *Datastore) GetUserByName(username string) (*shimmie.User, error) {
 	return db.getUserBy(userGetByNameQuery, username)
 }
 
-func (db *datastore) getUserBy(query string, id interface{}) (*shimmie.User, error) {
+func (db *Datastore) getUserBy(query string, id interface{}) (*shimmie.User, error) {
 	var (
 		u     shimmie.User
 		pass  sql.NullString
@@ -41,7 +41,7 @@ func (db *datastore) getUserBy(query string, id interface{}) (*shimmie.User, err
 	return &u, nil
 }
 
-func (db *datastore) DeleteUser(id int64) error {
+func (db *Datastore) DeleteUser(id int64) error {
 	stmt, err := db.Prepare(userDeleteStmt)
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func (db *datastore) DeleteUser(id int64) error {
 	return nil
 }
 
-func (db *datastore) CreateUser(u *shimmie.User) error {
+func (db *Datastore) CreateUser(u *shimmie.User) error {
 	stmt, err := db.Prepare(userInsertStmt)
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (db *datastore) CreateUser(u *shimmie.User) error {
 	return nil
 }
 
-func (db *datastore) CountUsers() (int, error) {
+func (db *Datastore) CountUsers() (int, error) {
 	return count(db.DB, userCountQuery)
 }
 
@@ -119,7 +119,7 @@ func count(db *sql.DB, query string) (int, error) {
 	return count, nil
 }
 
-func (db *datastore) GetAllUsers(limit, offset int) ([]shimmie.User, error) {
+func (db *Datastore) GetAllUsers(limit, offset int) ([]shimmie.User, error) {
 	if limit < 0 {
 		count, cerr := db.CountUsers()
 		if cerr != nil {

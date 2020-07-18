@@ -2,7 +2,7 @@ package store
 
 import "github.com/kusubooru/shimmie"
 
-func (db *datastore) GetAlias(oldTag string) (*shimmie.Alias, error) {
+func (db *Datastore) GetAlias(oldTag string) (*shimmie.Alias, error) {
 	var (
 		a shimmie.Alias
 	)
@@ -16,7 +16,7 @@ func (db *datastore) GetAlias(oldTag string) (*shimmie.Alias, error) {
 	return &a, nil
 }
 
-func (db *datastore) DeleteAlias(oldTag string) error {
+func (db *Datastore) DeleteAlias(oldTag string) error {
 	stmt, err := db.Prepare(aliasDeleteStmt)
 	if err != nil {
 		return err
@@ -27,7 +27,7 @@ func (db *datastore) DeleteAlias(oldTag string) error {
 	return nil
 }
 
-func (db *datastore) CreateAlias(alias *shimmie.Alias) error {
+func (db *Datastore) CreateAlias(alias *shimmie.Alias) error {
 	stmt, err := db.Prepare(aliasInsertStmt)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func (db *datastore) CreateAlias(alias *shimmie.Alias) error {
 	return err
 }
 
-func (db *datastore) CountAlias() (int, error) {
+func (db *Datastore) CountAlias() (int, error) {
 	var (
 		count int
 	)
@@ -47,7 +47,7 @@ func (db *datastore) CountAlias() (int, error) {
 	return count, nil
 }
 
-func (db *datastore) GetAllAlias(limit, offset int) ([]shimmie.Alias, error) {
+func (db *Datastore) GetAllAlias(limit, offset int) ([]shimmie.Alias, error) {
 	if limit < 0 {
 		count, cerr := db.CountAlias()
 		if cerr != nil {
@@ -81,7 +81,7 @@ func (db *datastore) GetAllAlias(limit, offset int) ([]shimmie.Alias, error) {
 	return alias, err
 }
 
-func (db *datastore) FindAlias(oldTag, newTag string) ([]shimmie.Alias, error) {
+func (db *Datastore) FindAlias(oldTag, newTag string) ([]shimmie.Alias, error) {
 	rows, err := db.Query(aliasFindQuery, "%"+oldTag+"%", "%"+newTag+"%")
 	if err != nil {
 		return nil, err

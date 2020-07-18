@@ -2,7 +2,7 @@ package store
 
 import "github.com/kusubooru/shimmie"
 
-func (db *datastore) MostImageUploads(limit int) ([]shimmie.UserScore, error) {
+func (db *Datastore) MostImageUploads(limit int) ([]shimmie.UserScore, error) {
 	const query = `
 	SELECT
 		count(img.owner_id) as score,
@@ -21,7 +21,7 @@ func (db *datastore) MostImageUploads(limit int) ([]shimmie.UserScore, error) {
 	return db.userScore(query, limit)
 }
 
-func (db *datastore) MostTagChanges(limit int) ([]shimmie.UserScore, error) {
+func (db *Datastore) MostTagChanges(limit int) ([]shimmie.UserScore, error) {
 	const query = `
 	SELECT
 		count(th.user_id) as score,
@@ -40,7 +40,7 @@ func (db *datastore) MostTagChanges(limit int) ([]shimmie.UserScore, error) {
 	return db.userScore(query, limit)
 }
 
-func (db *datastore) userScore(query string, limit int) ([]shimmie.UserScore, error) {
+func (db *Datastore) userScore(query string, limit int) ([]shimmie.UserScore, error) {
 	rows, err := db.Query(query, limit)
 	if err != nil {
 		return nil, err

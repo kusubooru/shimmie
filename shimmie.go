@@ -1,7 +1,6 @@
 package shimmie
 
 import (
-	"database/sql"
 	"errors"
 	"io"
 	"strings"
@@ -55,9 +54,6 @@ func New(imgPath, thumbPath string, s Store) *Shimmie {
 
 // Store describes all the operations that need to access database storage.
 type Store interface {
-	// SQLDB returns the encapsulated *sql.DB, mostly used for testing.
-	SQLDB() *sql.DB
-
 	// GetUser gets a user by ID.
 	GetUser(userID int64) (*User, error)
 	// GetUserByName gets a user by unique username.

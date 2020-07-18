@@ -1,0 +1,20 @@
+version: '2.0'
+services:
+  shimmie_db:
+    container_name: shimmie_db
+    image: mysql:5.5
+    restart: on-failure
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: shimmie
+      MYSQL_USER: shimmie
+      MYSQL_PASSWORD: shimmie
+    ports:
+      - '3306:3306'
+    expose:
+      # Opens port 3306 on the container (the right side).
+      - '3306'
+    volumes:
+      - shimmie_db:/var/lib/mysql
+volumes:
+  shimmie_db:

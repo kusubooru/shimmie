@@ -2,7 +2,7 @@ package store
 
 import "github.com/kusubooru/shimmie"
 
-func (db *datastore) Autocomplete(q string, limit, offset int) ([]*shimmie.Autocomplete, error) {
+func (db *Datastore) Autocomplete(q string, limit, offset int) ([]*shimmie.Autocomplete, error) {
 	if q == "" {
 		return []*shimmie.Autocomplete{}, nil
 	}

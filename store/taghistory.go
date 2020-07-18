@@ -2,7 +2,7 @@ package store
 
 import "github.com/kusubooru/shimmie"
 
-func (db *datastore) GetImageTagHistory(imageID int) ([]shimmie.TagHistory, error) {
+func (db *Datastore) GetImageTagHistory(imageID int) ([]shimmie.TagHistory, error) {
 	rows, err := db.Query(imageTagHistoryGetQuery, imageID)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (db *datastore) GetImageTagHistory(imageID int) ([]shimmie.TagHistory, erro
 	return ths, nil
 }
 
-func (db *datastore) GetTagHistory(id int) (*shimmie.TagHistory, error) {
+func (db *Datastore) GetTagHistory(id int) (*shimmie.TagHistory, error) {
 	var th shimmie.TagHistory
 	err := db.QueryRow(tagHistoryGetQuery, id).Scan(
 		&th.ID,
@@ -50,7 +50,7 @@ func (db *datastore) GetTagHistory(id int) (*shimmie.TagHistory, error) {
 	return &th, err
 }
 
-func (db *datastore) GetContributedTagHistory(imageOwnerUsername string) ([]shimmie.ContributedTagHistory, error) {
+func (db *Datastore) GetContributedTagHistory(imageOwnerUsername string) ([]shimmie.ContributedTagHistory, error) {
 	rows, err := db.Query(contributedTagHistoryGetQuery, imageOwnerUsername)
 	if err != nil {
 		return nil, err
