@@ -15,17 +15,12 @@ type Schema struct {
 
 // NewSchemer returns an implementation of Schemer that allows to easily create
 // and drop the database schema.
-func NewSchemer(driverName, username, password, host, port, dbName string, pingRetries int) *Schema {
-	db := connect(driverName, username, password, host, port, dbName, pingRetries)
+func NewSchemer(dataSource string, pingRetries int) *Schema {
+	db := openDB(dataSource, pingRetries)
 	return &Schema{db}
 }
 
-func connect(driverName, username, password, host, port, dbName string, pingRetries int) *sql.DB {
-	dataSourceName := fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true&multiStatements=true", username, password, host, port, dbName)
-	return openDB(dataSourceName, pingRetries)
-}
-
-func (db Schema) Create(dbName string) error {
+func (db Schema) Create() error {
 	return Tx(db.DB, func(tx *sql.Tx) error {
 		if query, err := createSchema(tx); err != nil {
 			return fmt.Errorf("failed to execute query:\n%s\nReason: %v", query, err)
@@ -34,17 +29,13 @@ func (db Schema) Create(dbName string) error {
 	})
 }
 
-func (db Schema) Wait(pingRetries int) error {
-	return pingDatabase(db.DB, pingRetries)
-}
-
-func (db Schema) allTables(ctx context.Context, dbName string) ([]string, error) {
+func (db Schema) allTables(ctx context.Context) ([]string, error) {
 	const q = `
 	SELECT table_name
 	FROM information_schema.tables
-	WHERE table_schema=?;`
+	WHERE table_schema="shimmie";`
 
-	rows, err := db.DB.QueryContext(ctx, q, dbName)
+	rows, err := db.DB.QueryContext(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +54,8 @@ func (db Schema) allTables(ctx context.Context, dbName string) ([]string, error)
 
 }
 
-func (db Schema) TruncateTables(ctx context.Context, dbName string) error {
-	tables, err := db.allTables(ctx, dbName)
+func (db Schema) TruncateTables(ctx context.Context) error {
+	tables, err := db.allTables(ctx)
 	if err != nil {
 		return fmt.Errorf("fetching all tables: %v", err)
 	}
