@@ -4,6 +4,7 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
+// GetTag returns an image tag.
 func (db *DB) GetTag(oldTag string) (*shimmie.Tag, error) {
 	var (
 		t shimmie.Tag
@@ -19,6 +20,7 @@ func (db *DB) GetTag(oldTag string) (*shimmie.Tag, error) {
 	return &t, nil
 }
 
+// DeleteTag deletes an image tag.
 func (db *DB) DeleteTag(name string) error {
 	stmt, err := db.Prepare(tagDeleteStmt)
 	if err != nil {
@@ -36,6 +38,7 @@ func (db *DB) DeleteTag(name string) error {
 	return nil
 }
 
+// CreateTag inserts an image tag to the db.
 func (db *DB) CreateTag(t *shimmie.Tag) error {
 	stmt, err := db.Prepare(tagInsertStmt)
 	if err != nil {
@@ -51,6 +54,7 @@ func (db *DB) CreateTag(t *shimmie.Tag) error {
 	return err
 }
 
+// GetAllTags returns all stored tags.
 func (db *DB) GetAllTags(limit, offset int) ([]*shimmie.Tag, error) {
 	rows, err := db.Query(tagsGetAllQuery, limit, offset)
 	if err != nil {

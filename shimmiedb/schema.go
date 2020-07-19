@@ -9,6 +9,8 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+// Schema has methods which allow to create the db schema as well as truncate
+// all tables.
 type Schema struct {
 	*sql.DB
 }
@@ -23,6 +25,7 @@ func NewSchemer(dataSource string, pingRetries int) (*Schema, error) {
 	return &Schema{db}, nil
 }
 
+// Create creates the database schema.
 func (db Schema) Create() error {
 	return Tx(db.DB, func(tx *sql.Tx) error {
 		if query, err := createSchema(tx); err != nil {
@@ -57,6 +60,7 @@ func (db Schema) allTables(ctx context.Context) ([]string, error) {
 
 }
 
+// TruncateTables truncates all the database tables.
 func (db Schema) TruncateTables(ctx context.Context) error {
 	tables, err := db.allTables(ctx)
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// DB has methods for most operations needed in the shimmie database.
 type DB struct {
 	*sql.DB
 }
@@ -50,10 +51,6 @@ func pingDatabase(db *sql.DB, pingRetries int) (err error) {
 		time.Sleep(time.Second)
 	}
 	return
-}
-
-func (db DB) Close() error {
-	return db.DB.Close()
 }
 
 // Tx allows to perform a function in a transaction. It detects error and panic

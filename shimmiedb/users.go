@@ -6,10 +6,12 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
+// GetUser gets a user by ID.
 func (db *DB) GetUser(userID int64) (*shimmie.User, error) {
 	return db.getUserBy(userGetQuery, userID)
 }
 
+// GetUserByName gets a user by unique username.
 func (db *DB) GetUserByName(username string) (*shimmie.User, error) {
 	return db.getUserBy(userGetByNameQuery, username)
 }
@@ -41,6 +43,7 @@ func (db *DB) getUserBy(query string, id interface{}) (*shimmie.User, error) {
 	return &u, nil
 }
 
+// DeleteUser deletes a user based on their ID.
 func (db *DB) DeleteUser(id int64) error {
 	stmt, err := db.Prepare(userDeleteStmt)
 	if err != nil {
@@ -58,6 +61,7 @@ func (db *DB) DeleteUser(id int64) error {
 	return nil
 }
 
+// CreateUser creates a new user and returns their ID.
 func (db *DB) CreateUser(u *shimmie.User) error {
 	stmt, err := db.Prepare(userInsertStmt)
 	if err != nil {
@@ -104,6 +108,7 @@ func (db *DB) CreateUser(u *shimmie.User) error {
 	return nil
 }
 
+// CountUsers returns how many user entries exist in the database.
 func (db *DB) CountUsers() (int, error) {
 	return count(db.DB, userCountQuery)
 }
@@ -119,6 +124,11 @@ func count(db *sql.DB, query string) (int, error) {
 	return count, nil
 }
 
+// GetAllUsers returns user entries of the database based on a limit and
+// an offset. If limit < 0, CountUsers will also be executed to get the
+// maximum limit and return all user entries. Offset still works in this
+// case. For example, assuming 10 entries, GetAllUsers(-1, 0), will return
+// all 10 entries and GetAllUsers(-1, 8) will return the last 2 entries.
 func (db *DB) GetAllUsers(limit, offset int) ([]shimmie.User, error) {
 	if limit < 0 {
 		count, cerr := db.CountUsers()

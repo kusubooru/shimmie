@@ -6,6 +6,7 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
+// CreatePM inserts a new private message.
 func (db *DB) CreatePM(pm *shimmie.PM) error {
 	if pm == nil {
 		return fmt.Errorf("cannot create nil private message")
@@ -59,6 +60,9 @@ func (db *DB) CreatePM(pm *shimmie.PM) error {
 	return nil
 }
 
+// GetPMs returns the private messages exchanged from a user to
+// another user. The arguments from and to are user names and either or
+// both can be left empty.
 func (db *DB) GetPMs(from, to string, choice shimmie.PMChoice) ([]*shimmie.PM, error) {
 	var query = `
 SELECT 

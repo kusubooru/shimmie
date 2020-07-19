@@ -14,6 +14,7 @@ const (
 	configKeyAnalyticsIDOld = "ga_profile_id"
 )
 
+// GetCommon gets common configuration values.
 func (db *DB) GetCommon() (*shimmie.Common, error) {
 	keys := []string{
 		configKeyTitle,
@@ -38,6 +39,7 @@ func (db *DB) GetCommon() (*shimmie.Common, error) {
 	return &conf, nil
 }
 
+// GetConfig gets shimmie config values.
 func (db *DB) GetConfig(keys ...string) (map[string]string, error) {
 	query := fmt.Sprint(configGetQuery)
 	if len(keys) != 0 {

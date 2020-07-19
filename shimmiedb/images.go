@@ -12,6 +12,7 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
+// CreateImage inserts a new image to the database.
 func (db *DB) CreateImage(ctx context.Context, img shimmie.Image) (int64, error) {
 	const query = `
 	INSERT INTO images(
@@ -68,6 +69,7 @@ func (db *DB) CreateImage(ctx context.Context, img shimmie.Image) (int64, error)
 	return res.LastInsertId()
 }
 
+// RateImage sets the rating for an image.
 func (db *DB) RateImage(id int, rating string) error {
 	const query = `
 	UPDATE images
@@ -95,6 +97,7 @@ func (db *DB) RateImage(id int, rating string) error {
 	return err
 }
 
+// GetImage gets a shimmie Image metadata (not it's bytes).
 func (db *DB) GetImage(id int) (*shimmie.Image, error) {
 	const query = `
 	SELECT *
@@ -144,6 +147,8 @@ func (db *DB) GetImage(id int) (*shimmie.Image, error) {
 	return &img, nil
 }
 
+// WriteImageFile reads a shimmie image file (image or thumb) which exists
+// under a path and has a hash and then writes to w.
 func (db *DB) WriteImageFile(w io.Writer, path, hash string) error {
 	// Each image has a hash and it's file is stored under a path (one for the
 	// images and one for the thumbs), under a folder which begins with the
@@ -179,6 +184,8 @@ func (db *DB) WriteImageFile(w io.Writer, path, hash string) error {
 	return err
 }
 
+// GetRatedImages returns all the images that have been rated as safe
+// ignoring the ones from username.
 func (db *DB) GetRatedImages(username string) ([]shimmie.RatedImage, error) {
 	rows, err := db.Query(imageGetRatedQuery, username)
 	if err != nil {

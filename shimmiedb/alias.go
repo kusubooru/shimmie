@@ -2,6 +2,7 @@ package shimmiedb
 
 import "github.com/kusubooru/shimmie"
 
+// GetAlias returns an alias based on its old tag.
 func (db *DB) GetAlias(oldTag string) (*shimmie.Alias, error) {
 	var (
 		a shimmie.Alias
@@ -16,6 +17,7 @@ func (db *DB) GetAlias(oldTag string) (*shimmie.Alias, error) {
 	return &a, nil
 }
 
+// DeleteAlias deletes an alias based on its old tag.
 func (db *DB) DeleteAlias(oldTag string) error {
 	stmt, err := db.Prepare(aliasDeleteStmt)
 	if err != nil {
@@ -27,6 +29,7 @@ func (db *DB) DeleteAlias(oldTag string) error {
 	return nil
 }
 
+// CreateAlias creates a new alias.
 func (db *DB) CreateAlias(alias *shimmie.Alias) error {
 	stmt, err := db.Prepare(aliasInsertStmt)
 	if err != nil {
@@ -36,6 +39,7 @@ func (db *DB) CreateAlias(alias *shimmie.Alias) error {
 	return err
 }
 
+// CountAlias returns how many alias entries exist in the database.
 func (db *DB) CountAlias() (int, error) {
 	var (
 		count int
@@ -47,6 +51,11 @@ func (db *DB) CountAlias() (int, error) {
 	return count, nil
 }
 
+// GetAllAlias returns alias entries of the database based on a limit and
+// an offset. If limit < 0, CountAlias will also be executed to get the
+// maximum limit and return all alias entries. Offset still works in this
+// case. For example, assuming 10 entries, GetAllAlias(-1, 0), will return
+// all 10 entries and GetAllAlias(-1, 8) will return the last 2 entries.
 func (db *DB) GetAllAlias(limit, offset int) ([]shimmie.Alias, error) {
 	if limit < 0 {
 		count, cerr := db.CountAlias()
@@ -81,6 +90,7 @@ func (db *DB) GetAllAlias(limit, offset int) ([]shimmie.Alias, error) {
 	return alias, err
 }
 
+// FindAlias returns all alias matching an oldTag or a newTag or both.
 func (db *DB) FindAlias(oldTag, newTag string) ([]shimmie.Alias, error) {
 	rows, err := db.Query(aliasFindQuery, "%"+oldTag+"%", "%"+newTag+"%")
 	if err != nil {

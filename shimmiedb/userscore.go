@@ -2,6 +2,8 @@ package shimmiedb
 
 import "github.com/kusubooru/shimmie"
 
+// MostImageUploads can be used to find which users have the highest number of
+// image uploads.
 func (db *DB) MostImageUploads(limit int) ([]shimmie.UserScore, error) {
 	const query = `
 	SELECT
@@ -21,6 +23,8 @@ func (db *DB) MostImageUploads(limit int) ([]shimmie.UserScore, error) {
 	return db.userScore(query, limit)
 }
 
+// MostTagEdits can be used to find which users have the highest number of tag
+// edits.
 func (db *DB) MostTagEdits(limit int) ([]shimmie.UserScore, error) {
 	const query = `
 	SELECT

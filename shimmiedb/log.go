@@ -7,6 +7,7 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
+// LogRating logs when an image rating is set.
 func (db *DB) LogRating(imgID int, imgRating, username, userIP string) error {
 	rating := shimmie.ImageRating(imgRating)
 	msg := fmt.Sprintf("Rating for Image #%d set to: %v", imgID, rating)
@@ -16,6 +17,7 @@ func (db *DB) LogRating(imgID int, imgRating, username, userIP string) error {
 	return err
 }
 
+// Log stores a message on score_log table.
 func (db *DB) Log(section, username, address string, priority int, message string) (*shimmie.SCoreLog, error) {
 	stmt, err := db.Prepare(scoreLogInsertStmt)
 	if err != nil {

@@ -2,6 +2,8 @@ package shimmiedb
 
 import "github.com/kusubooru/shimmie"
 
+// Autocomplete searches tags and tag alias for a term and returns
+// suggestions tags to be used for a UI autocomplete.
 func (db *DB) Autocomplete(q string, limit, offset int) ([]*shimmie.Autocomplete, error) {
 	if q == "" {
 		return []*shimmie.Autocomplete{}, nil

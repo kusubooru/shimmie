@@ -7,6 +7,7 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
+// CreateTagHistory inserts a new tag history for an image in the db.
 func (db *DB) CreateTagHistory(ctx context.Context, th shimmie.TagHistory) (int64, error) {
 	if th.DateSet == nil {
 		now := time.Now()
@@ -49,6 +50,7 @@ func (db *DB) CreateTagHistory(ctx context.Context, th shimmie.TagHistory) (int6
 	return res.LastInsertId()
 }
 
+// GetImageTagHistory returns the previous tags of an image.
 func (db *DB) GetImageTagHistory(imageID int) ([]shimmie.TagHistory, error) {
 	rows, err := db.Query(imageTagHistoryGetQuery, imageID)
 	if err != nil {
@@ -81,6 +83,7 @@ func (db *DB) GetImageTagHistory(imageID int) ([]shimmie.TagHistory, error) {
 	return ths, nil
 }
 
+// GetTagHistory returns a tag_history row.
 func (db *DB) GetTagHistory(id int) (*shimmie.TagHistory, error) {
 	var th shimmie.TagHistory
 	err := db.QueryRow(tagHistoryGetQuery, id).Scan(
@@ -97,6 +100,9 @@ func (db *DB) GetTagHistory(id int) (*shimmie.TagHistory, error) {
 	return &th, err
 }
 
+// GetContributedTagHistory returns the latest tag history i.e. tag changes
+// that were done by a contributor on an owner's image, per image. It is
+// used to fetch data for the "Tag Approval" page.
 func (db *DB) GetContributedTagHistory(imageOwnerUsername string) ([]shimmie.ContributedTagHistory, error) {
 	rows, err := db.Query(contributedTagHistoryGetQuery, imageOwnerUsername)
 	if err != nil {
