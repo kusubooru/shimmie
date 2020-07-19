@@ -219,13 +219,14 @@ func (c Common) SiteTitle() string {
 
 // TagHistory holds previous tags for an image.
 type TagHistory struct {
-	ID      int
-	ImageID int
-	UserID  int
+	ID      int64
+	ImageID int64
+	UserID  int64
 	UserIP  string
 	Tags    string
 	DateSet *time.Time
-	Name    string
+	// Name of the user who did the edit.
+	Name string
 }
 
 // ContributedTagHistory holds previous tags for an image that were set by

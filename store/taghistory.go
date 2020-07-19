@@ -1,6 +1,53 @@
 package store
 
-import "github.com/kusubooru/shimmie"
+import (
+	"context"
+	"time"
+
+	"github.com/kusubooru/shimmie"
+)
+
+func (db *Datastore) CreateTagHistory(ctx context.Context, th shimmie.TagHistory) (int64, error) {
+	if th.DateSet == nil {
+		now := time.Now()
+		th.DateSet = &now
+	}
+	const query = `
+	INSERT INTO tag_histories(
+		id,
+		image_id,
+		user_id,
+		user_ip,
+		tags,
+		date_set
+	) values (
+		?,
+		?,
+		?,
+		?,
+		?,
+		?
+	);`
+
+	stmt, err := db.Prepare(query)
+	if err != nil {
+		return 0, err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.ExecContext(ctx,
+		&th.ID,
+		&th.ImageID,
+		&th.UserID,
+		&th.UserIP,
+		&th.Tags,
+		&th.DateSet,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return res.LastInsertId()
+}
 
 func (db *Datastore) GetImageTagHistory(imageID int) ([]shimmie.TagHistory, error) {
 	rows, err := db.Query(imageTagHistoryGetQuery, imageID)

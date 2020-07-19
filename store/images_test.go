@@ -24,6 +24,6 @@ func TestCreateImage(t *testing.T) {
 		t.Errorf("CreateImage(img) returned error: %v", err)
 	}
 	if id == 0 {
-		t.Error("CreateImage(img) should return id but it was 0")
+		t.Error("CreateImage(img) should return a non-zero id")
 	}
 }

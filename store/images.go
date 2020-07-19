@@ -15,6 +15,7 @@ import (
 func (db *Datastore) CreateImage(ctx context.Context, img shimmie.Image) (int64, error) {
 	const query = `
 	INSERT INTO images(
+		id,
 		owner_id,
 		owner_ip,
 		filename,
@@ -37,6 +38,7 @@ func (db *Datastore) CreateImage(ctx context.Context, img shimmie.Image) (int64,
 		?,
 		?,
 		?,
+		?,
 		?
 	);`
 
@@ -47,6 +49,7 @@ func (db *Datastore) CreateImage(ctx context.Context, img shimmie.Image) (int64,
 	defer stmt.Close()
 
 	res, err := stmt.ExecContext(ctx,
+		img.ID,
 		img.OwnerID,
 		img.OwnerIP,
 		img.Filename,

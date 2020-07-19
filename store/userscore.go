@@ -21,20 +21,20 @@ func (db *Datastore) MostImageUploads(limit int) ([]shimmie.UserScore, error) {
 	return db.userScore(query, limit)
 }
 
-func (db *Datastore) MostTagChanges(limit int) ([]shimmie.UserScore, error) {
+func (db *Datastore) MostTagEdits(limit int) ([]shimmie.UserScore, error) {
 	const query = `
 	SELECT
 		count(th.user_id) as score,
 		u.id,
 		u.name,
-		u.join_date,
+		u.joindate,
 		u.email,
 		u.class
 	FROM tag_histories th
 	  JOIN users u
 	  ON th.user_id=u.id
 	GROUP BY th.user_id
-	ORDER BY score
+	ORDER BY score DESC
 	LIMIT ?;`
 
 	return db.userScore(query, limit)
