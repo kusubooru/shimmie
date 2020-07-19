@@ -172,8 +172,8 @@ func (ri RatedImage) RateDateFormat() string {
 
 // Image represents a shimmie image.
 type Image struct {
-	ID           int
-	OwnerID      int
+	ID           int64
+	OwnerID      int64
 	OwnerIP      string
 	Filename     string
 	Filesize     int

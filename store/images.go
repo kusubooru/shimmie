@@ -2,6 +2,7 @@ package store
 
 import (
 	"bufio"
+	"context"
 	"database/sql"
 	"fmt"
 	"io"
@@ -11,8 +12,66 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
+func (db *Datastore) CreateImage(ctx context.Context, img shimmie.Image) (int64, error) {
+	const query = `
+	INSERT INTO images(
+		owner_id,
+		owner_ip,
+		filename,
+		filesize,
+		hash,
+		ext,
+		source,
+		width,
+		height,
+		posted,
+		locked
+	) values (
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?
+	);`
+
+	stmt, err := db.Prepare(query)
+	if err != nil {
+		return 0, err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.ExecContext(ctx,
+		img.OwnerID,
+		img.OwnerIP,
+		img.Filename,
+		img.Filesize,
+		img.Hash,
+		img.Ext,
+		img.Source,
+		img.Width,
+		img.Height,
+		img.Posted,
+		img.Locked,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return res.LastInsertId()
+}
+
 func (db *Datastore) RateImage(id int, rating string) error {
-	stmt, err := db.Prepare(imageUpdateRatingStmt)
+	const query = `
+	UPDATE images
+	SET rating=?
+	WHERE id=?;`
+
+	stmt, err := db.Prepare(query)
 	if err != nil {
 		return err
 	}
@@ -34,6 +93,10 @@ func (db *Datastore) RateImage(id int, rating string) error {
 }
 
 func (db *Datastore) GetImage(id int) (*shimmie.Image, error) {
+	const query = `
+	SELECT *
+	FROM images
+	WHERE id=?;`
 
 	var (
 		img      shimmie.Image
@@ -41,7 +104,7 @@ func (db *Datastore) GetImage(id int) (*shimmie.Image, error) {
 		parentID sql.NullInt64
 		author   sql.NullString
 	)
-	err := db.QueryRow(imageGetQuery, id).Scan(
+	err := db.QueryRow(query, id).Scan(
 		&img.ID,
 		&img.OwnerID,
 		&img.OwnerIP,
@@ -231,17 +294,5 @@ WHERE
   img.id = safe.rated_id
   AND rating = 's'
   AND rater != ?
-`
-
-	imageGetQuery = `
-SELECT * 
-FROM images 
-WHERE id=?
-`
-
-	imageUpdateRatingStmt = `
-UPDATE images 
-SET rating=? 
-WHERE id=?
 `
 )
