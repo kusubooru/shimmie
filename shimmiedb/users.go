@@ -1,4 +1,4 @@
-package store
+package shimmiedb
 
 import (
 	"database/sql"
@@ -6,15 +6,15 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
-func (db *Datastore) GetUser(userID int64) (*shimmie.User, error) {
+func (db *DB) GetUser(userID int64) (*shimmie.User, error) {
 	return db.getUserBy(userGetQuery, userID)
 }
 
-func (db *Datastore) GetUserByName(username string) (*shimmie.User, error) {
+func (db *DB) GetUserByName(username string) (*shimmie.User, error) {
 	return db.getUserBy(userGetByNameQuery, username)
 }
 
-func (db *Datastore) getUserBy(query string, id interface{}) (*shimmie.User, error) {
+func (db *DB) getUserBy(query string, id interface{}) (*shimmie.User, error) {
 	var (
 		u     shimmie.User
 		pass  sql.NullString
@@ -41,7 +41,7 @@ func (db *Datastore) getUserBy(query string, id interface{}) (*shimmie.User, err
 	return &u, nil
 }
 
-func (db *Datastore) DeleteUser(id int64) error {
+func (db *DB) DeleteUser(id int64) error {
 	stmt, err := db.Prepare(userDeleteStmt)
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func (db *Datastore) DeleteUser(id int64) error {
 	return nil
 }
 
-func (db *Datastore) CreateUser(u *shimmie.User) error {
+func (db *DB) CreateUser(u *shimmie.User) error {
 	stmt, err := db.Prepare(userInsertStmt)
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (db *Datastore) CreateUser(u *shimmie.User) error {
 	return nil
 }
 
-func (db *Datastore) CountUsers() (int, error) {
+func (db *DB) CountUsers() (int, error) {
 	return count(db.DB, userCountQuery)
 }
 
@@ -119,7 +119,7 @@ func count(db *sql.DB, query string) (int, error) {
 	return count, nil
 }
 
-func (db *Datastore) GetAllUsers(limit, offset int) ([]shimmie.User, error) {
+func (db *DB) GetAllUsers(limit, offset int) ([]shimmie.User, error) {
 	if limit < 0 {
 		count, cerr := db.CountUsers()
 		if cerr != nil {

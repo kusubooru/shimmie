@@ -1,4 +1,4 @@
-package store
+package shimmiedb
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
-func (db *Datastore) LogRating(imgID int, imgRating, username, userIP string) error {
+func (db *DB) LogRating(imgID int, imgRating, username, userIP string) error {
 	rating := shimmie.ImageRating(imgRating)
 	msg := fmt.Sprintf("Rating for Image #%d set to: %v", imgID, rating)
 
@@ -16,7 +16,7 @@ func (db *Datastore) LogRating(imgID int, imgRating, username, userIP string) er
 	return err
 }
 
-func (db *Datastore) Log(section, username, address string, priority int, message string) (*shimmie.SCoreLog, error) {
+func (db *DB) Log(section, username, address string, priority int, message string) (*shimmie.SCoreLog, error) {
 	stmt, err := db.Prepare(scoreLogInsertStmt)
 	if err != nil {
 		return nil, err

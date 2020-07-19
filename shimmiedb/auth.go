@@ -1,4 +1,4 @@
-package store
+package shimmiedb
 
 import (
 	"crypto/subtle"
@@ -19,7 +19,7 @@ import (
 // - ErrWrongCredentials if the username and password do not match.
 //
 // - An error if something goes wrong with the database.
-func (db *Datastore) Verify(username, password string) (*shimmie.User, error) {
+func (db *DB) Verify(username, password string) (*shimmie.User, error) {
 	u, err := db.GetUserByName(username)
 	if err != nil {
 		if err == sql.ErrNoRows {

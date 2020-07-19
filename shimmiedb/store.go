@@ -1,4 +1,4 @@
-package store
+package shimmiedb
 
 import (
 	"database/sql"
@@ -9,17 +9,17 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type Datastore struct {
+type DB struct {
 	*sql.DB
 }
 
 // Open creates a database connection for the given driver and configuration.
-func Open(dataSource string, pingRetries int) (*Datastore, error) {
+func Open(dataSource string, pingRetries int) (*DB, error) {
 	db, err := openDB(dataSource, pingRetries)
 	if err != nil {
 		return nil, err
 	}
-	return &Datastore{db}, nil
+	return &DB{db}, nil
 }
 
 // openDB opens a new database connection with the specified connection string.
@@ -52,7 +52,7 @@ func pingDatabase(db *sql.DB, pingRetries int) (err error) {
 	return
 }
 
-func (db Datastore) Close() error {
+func (db DB) Close() error {
 	return db.DB.Close()
 }
 

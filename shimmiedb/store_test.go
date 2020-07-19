@@ -1,11 +1,11 @@
-package store_test
+package shimmiedb_test
 
 import (
 	"context"
 	"flag"
 	"testing"
 
-	"github.com/kusubooru/shimmie/store"
+	"github.com/kusubooru/shimmie/shimmiedb"
 )
 
 const (
@@ -16,12 +16,12 @@ var (
 	testDataSource = flag.String("datasource", defaultDataSource, "database data source used for tests")
 )
 
-func setup(t *testing.T) (*store.Datastore, *store.Schema) {
+func setup(t *testing.T) (*shimmiedb.DB, *shimmiedb.Schema) {
 	if testing.Short() {
 		t.Skip("skipping database test in short mode")
 	}
 
-	schema, err := store.NewSchemer(*testDataSource, 0)
+	schema, err := shimmiedb.NewSchemer(*testDataSource, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,14 +33,14 @@ func setup(t *testing.T) (*store.Datastore, *store.Schema) {
 		t.Fatalf("failed to create schema using datasource %s: %v", *testDataSource, err)
 	}
 
-	shim, err := store.Open(*testDataSource, 10)
+	shim, err := shimmiedb.Open(*testDataSource, 10)
 	if err != nil {
 		t.Fatalf("failed to connect using datasource %s: %v", *testDataSource, err)
 	}
 	return shim, schema
 }
 
-func teardown(t *testing.T, shim *store.Datastore, schema *store.Schema) {
+func teardown(t *testing.T, shim *shimmiedb.DB, schema *shimmiedb.Schema) {
 	if err := schema.TruncateTables(context.Background()); err != nil {
 		t.Errorf("error truncating tables: %v", err)
 	}

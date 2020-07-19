@@ -1,10 +1,10 @@
-package store
+package shimmiedb
 
 import (
 	"github.com/kusubooru/shimmie"
 )
 
-func (db *Datastore) GetTag(oldTag string) (*shimmie.Tag, error) {
+func (db *DB) GetTag(oldTag string) (*shimmie.Tag, error) {
 	var (
 		t shimmie.Tag
 	)
@@ -19,7 +19,7 @@ func (db *Datastore) GetTag(oldTag string) (*shimmie.Tag, error) {
 	return &t, nil
 }
 
-func (db *Datastore) DeleteTag(name string) error {
+func (db *DB) DeleteTag(name string) error {
 	stmt, err := db.Prepare(tagDeleteStmt)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func (db *Datastore) DeleteTag(name string) error {
 	return nil
 }
 
-func (db *Datastore) CreateTag(t *shimmie.Tag) error {
+func (db *DB) CreateTag(t *shimmie.Tag) error {
 	stmt, err := db.Prepare(tagInsertStmt)
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (db *Datastore) CreateTag(t *shimmie.Tag) error {
 	return err
 }
 
-func (db *Datastore) GetAllTags(limit, offset int) ([]*shimmie.Tag, error) {
+func (db *DB) GetAllTags(limit, offset int) ([]*shimmie.Tag, error) {
 	rows, err := db.Query(tagsGetAllQuery, limit, offset)
 	if err != nil {
 		return nil, err

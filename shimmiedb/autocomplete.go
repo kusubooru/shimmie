@@ -1,8 +1,8 @@
-package store
+package shimmiedb
 
 import "github.com/kusubooru/shimmie"
 
-func (db *Datastore) Autocomplete(q string, limit, offset int) ([]*shimmie.Autocomplete, error) {
+func (db *DB) Autocomplete(q string, limit, offset int) ([]*shimmie.Autocomplete, error) {
 	if q == "" {
 		return []*shimmie.Autocomplete{}, nil
 	}

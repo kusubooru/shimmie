@@ -1,8 +1,8 @@
-package store
+package shimmiedb
 
 import "github.com/kusubooru/shimmie"
 
-func (db *Datastore) MostImageUploads(limit int) ([]shimmie.UserScore, error) {
+func (db *DB) MostImageUploads(limit int) ([]shimmie.UserScore, error) {
 	const query = `
 	SELECT
 		count(img.owner_id) as score,
@@ -21,7 +21,7 @@ func (db *Datastore) MostImageUploads(limit int) ([]shimmie.UserScore, error) {
 	return db.userScore(query, limit)
 }
 
-func (db *Datastore) MostTagEdits(limit int) ([]shimmie.UserScore, error) {
+func (db *DB) MostTagEdits(limit int) ([]shimmie.UserScore, error) {
 	const query = `
 	SELECT
 		count(th.user_id) as score,
@@ -40,7 +40,7 @@ func (db *Datastore) MostTagEdits(limit int) ([]shimmie.UserScore, error) {
 	return db.userScore(query, limit)
 }
 
-func (db *Datastore) userScore(query string, limit int) ([]shimmie.UserScore, error) {
+func (db *DB) userScore(query string, limit int) ([]shimmie.UserScore, error) {
 	rows, err := db.Query(query, limit)
 	if err != nil {
 		return nil, err

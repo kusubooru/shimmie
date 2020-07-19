@@ -1,4 +1,4 @@
-package store
+package shimmiedb
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
-func (db *Datastore) CreateTagHistory(ctx context.Context, th shimmie.TagHistory) (int64, error) {
+func (db *DB) CreateTagHistory(ctx context.Context, th shimmie.TagHistory) (int64, error) {
 	if th.DateSet == nil {
 		now := time.Now()
 		th.DateSet = &now
@@ -49,7 +49,7 @@ func (db *Datastore) CreateTagHistory(ctx context.Context, th shimmie.TagHistory
 	return res.LastInsertId()
 }
 
-func (db *Datastore) GetImageTagHistory(imageID int) ([]shimmie.TagHistory, error) {
+func (db *DB) GetImageTagHistory(imageID int) ([]shimmie.TagHistory, error) {
 	rows, err := db.Query(imageTagHistoryGetQuery, imageID)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (db *Datastore) GetImageTagHistory(imageID int) ([]shimmie.TagHistory, erro
 	return ths, nil
 }
 
-func (db *Datastore) GetTagHistory(id int) (*shimmie.TagHistory, error) {
+func (db *DB) GetTagHistory(id int) (*shimmie.TagHistory, error) {
 	var th shimmie.TagHistory
 	err := db.QueryRow(tagHistoryGetQuery, id).Scan(
 		&th.ID,
@@ -97,7 +97,7 @@ func (db *Datastore) GetTagHistory(id int) (*shimmie.TagHistory, error) {
 	return &th, err
 }
 
-func (db *Datastore) GetContributedTagHistory(imageOwnerUsername string) ([]shimmie.ContributedTagHistory, error) {
+func (db *DB) GetContributedTagHistory(imageOwnerUsername string) ([]shimmie.ContributedTagHistory, error) {
 	rows, err := db.Query(contributedTagHistoryGetQuery, imageOwnerUsername)
 	if err != nil {
 		return nil, err

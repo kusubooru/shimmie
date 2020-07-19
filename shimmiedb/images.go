@@ -1,4 +1,4 @@
-package store
+package shimmiedb
 
 import (
 	"bufio"
@@ -12,7 +12,7 @@ import (
 	"github.com/kusubooru/shimmie"
 )
 
-func (db *Datastore) CreateImage(ctx context.Context, img shimmie.Image) (int64, error) {
+func (db *DB) CreateImage(ctx context.Context, img shimmie.Image) (int64, error) {
 	const query = `
 	INSERT INTO images(
 		id,
@@ -68,7 +68,7 @@ func (db *Datastore) CreateImage(ctx context.Context, img shimmie.Image) (int64,
 	return res.LastInsertId()
 }
 
-func (db *Datastore) RateImage(id int, rating string) error {
+func (db *DB) RateImage(id int, rating string) error {
 	const query = `
 	UPDATE images
 	SET rating=?
@@ -95,7 +95,7 @@ func (db *Datastore) RateImage(id int, rating string) error {
 	return err
 }
 
-func (db *Datastore) GetImage(id int) (*shimmie.Image, error) {
+func (db *DB) GetImage(id int) (*shimmie.Image, error) {
 	const query = `
 	SELECT *
 	FROM images
@@ -144,7 +144,7 @@ func (db *Datastore) GetImage(id int) (*shimmie.Image, error) {
 	return &img, nil
 }
 
-func (db *Datastore) WriteImageFile(w io.Writer, path, hash string) error {
+func (db *DB) WriteImageFile(w io.Writer, path, hash string) error {
 	// Each image has a hash and it's file is stored under a path (one for the
 	// images and one for the thumbs), under a folder which begins with the
 	// first two letters of the hash.
@@ -179,7 +179,7 @@ func (db *Datastore) WriteImageFile(w io.Writer, path, hash string) error {
 	return err
 }
 
-func (db *Datastore) GetRatedImages(username string) ([]shimmie.RatedImage, error) {
+func (db *DB) GetRatedImages(username string) ([]shimmie.RatedImage, error) {
 	rows, err := db.Query(imageGetRatedQuery, username)
 	if err != nil {
 		return nil, err
