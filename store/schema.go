@@ -15,9 +15,12 @@ type Schema struct {
 
 // NewSchemer returns an implementation of Schemer that allows to easily create
 // and drop the database schema.
-func NewSchemer(dataSource string, pingRetries int) *Schema {
-	db := openDB(dataSource, pingRetries)
-	return &Schema{db}
+func NewSchemer(dataSource string, pingRetries int) (*Schema, error) {
+	db, err := openDB(dataSource, pingRetries)
+	if err != nil {
+		return nil, err
+	}
+	return &Schema{db}, nil
 }
 
 func (db Schema) Create() error {

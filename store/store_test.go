@@ -20,17 +20,23 @@ func setup(t *testing.T) (*store.Datastore, *store.Schema) {
 	if testing.Short() {
 		t.Skip("skipping database test in short mode")
 	}
-	schema := store.NewSchemer(*testDataSource, 0)
-	err := schema.DB.Ping()
+
+	schema, err := store.NewSchemer(*testDataSource, 0)
 	if err != nil {
+		t.Fatal(err)
+	}
+	if err := schema.DB.Ping(); err != nil {
 		t.Fatalf("make sure database is up: use docker-compose up -d: %v", err)
 	}
-
 	err = schema.Create()
 	if err != nil {
 		t.Fatalf("failed to create schema using datasource %s: %v", *testDataSource, err)
 	}
-	shim := store.Open(*testDataSource, 10)
+
+	shim, err := store.Open(*testDataSource, 10)
+	if err != nil {
+		t.Fatalf("failed to connect using datasource %s: %v", *testDataSource, err)
+	}
 	return shim, schema
 }
 

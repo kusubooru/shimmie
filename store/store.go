@@ -3,7 +3,6 @@ package store
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"time"
 
 	// mysql driver
@@ -15,26 +14,28 @@ type Datastore struct {
 }
 
 // Open creates a database connection for the given driver and configuration.
-func Open(config string, pingRetries int) *Datastore {
-	db := openDB(config, pingRetries)
-	return &Datastore{db}
+func Open(dataSource string, pingRetries int) (*Datastore, error) {
+	db, err := openDB(dataSource, pingRetries)
+	if err != nil {
+		return nil, err
+	}
+	return &Datastore{db}, nil
 }
 
-// openDB opens a new database connection with the specified driver and
-// connection string.
-func openDB(config string, pingRetries int) *sql.DB {
-	db, err := sql.Open("mysql", config)
+// openDB opens a new database connection with the specified connection string.
+func openDB(dataSource string, pingRetries int) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dataSource)
 	if err != nil {
-		log.Fatalln("database connection failed:", err)
+		return nil, fmt.Errorf("opening db: %v", err)
 	}
 
 	// per issue https://github.com/go-sql-driver/mysql/issues/257
 	db.SetMaxIdleConns(0)
 
 	if err := pingDatabase(db, pingRetries); err != nil {
-		log.Fatalln("database ping attempts failed:", err)
+		return nil, fmt.Errorf("pinging db %d times: %v", pingRetries, err)
 	}
-	return db
+	return db, nil
 }
 
 // helper function to ping the database with backoff to ensure a connection can
